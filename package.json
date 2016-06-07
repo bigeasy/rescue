@@ -1,0 +1,31 @@
+{
+    "name":                 "recover",
+    "version":              "9.9.9",
+    "description":          "Catch or rethrow a Cadence exception based on a specific error property.",
+    "keywords":
+    [
+                            "cadence", "control", "flow", "async"
+    ],
+    "author":               "Alan Gutierrez <alan@prettyrobots.com>",
+    "contributors":         [],
+    "homepage":             "https://github.com/bigeasy/recover",
+    "bugs":                 "https://github.com/bigeasy/recover/issues",
+    "license":              "MIT",
+    "repository":
+    {
+                            "type": "git",
+                            "url": "http://github.com/bigeasy/recover.git"
+    },
+    "dependencies":
+    {
+    },
+    "devDependencies":
+    {
+                            "proof":                "1.x"
+    },
+    "main":                 "recover",
+    "scripts":
+    {
+                            "test": "proof platform win32 && proof test */*.t.js || t/test"
+    }
+}
