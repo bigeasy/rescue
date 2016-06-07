@@ -1,1 +1,1 @@
-Recover Cadence step based on specific error property.
+Catch or rethrow a Cadence exception based on a specific error property.
