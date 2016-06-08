@@ -1,6 +1,6 @@
 {
     "name":                 "recover",
-    "version":              "0.0.0",
+    "version":              "0.0.1",
     "description":          "Catch or rethrow a Cadence exception based on a specific error property.",
     "keywords":
     [
