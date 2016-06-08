@@ -1,4 +1,4 @@
-require('proof')(2, prove)
+require('proof')(3, prove)
 
 function prove (assert) {
     var recover = require('..')
@@ -24,5 +24,19 @@ function prove (assert) {
         }
     } catch (error) {
         assert(error.message, 'thrown', 'rethrown')
+    }
+
+    array = recover(function (property) {
+        var error = new Error('thrown')
+        error.property = property
+        throw error
+    }, /^thrown$/, function (error) {
+        assert(error.message, 'thrown', 'message caught')
+    })
+
+    try {
+        array[0]('error')
+    } catch (error) {
+        array[1](error)
     }
 }

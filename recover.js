@@ -1,7 +1,15 @@
 module.exports = function (block, regex, rescue) {
-    var property = /^\/\^([$\w][$\w\d]*):/.exec(regex.toString())[1]
+    var $ = /^\/\^([$\w][$\w\d]*):/.exec(regex.toString()), prefix, first, second
+    if ($) {
+        prefix = $[1] + ':'
+        first = second = $[1]
+    } else {
+        prefix = ''
+        first = 'code'
+        second = 'message'
+    }
     return [block, function (error) {
-        if (regex.test(property + ':' + error[property])) {
+        if (regex.test(prefix + (error[first] || error[second]))) {
             rescue(error)
         } else {
             throw error
