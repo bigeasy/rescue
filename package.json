@@ -1,5 +1,5 @@
 {
-    "name":                 "recover",
+    "name":                 "rescue",
     "version":              "0.0.1",
     "description":          "Catch or rethrow a Cadence exception based on a specific error property.",
     "keywords":
@@ -8,13 +8,13 @@
     ],
     "author":               "Alan Gutierrez <alan@prettyrobots.com>",
     "contributors":         [],
-    "homepage":             "https://github.com/bigeasy/recover",
-    "bugs":                 "https://github.com/bigeasy/recover/issues",
+    "homepage":             "https://github.com/bigeasy/rescue",
+    "bugs":                 "https://github.com/bigeasy/rescue/issues",
     "license":              "MIT",
     "repository":
     {
                             "type": "git",
-                            "url": "http://github.com/bigeasy/recover.git"
+                            "url": "http://github.com/bigeasy/rescue.git"
     },
     "dependencies":
     {
@@ -23,7 +23,7 @@
     {
                             "proof":                "1.x"
     },
-    "main":                 "recover",
+    "main":                 "rescue",
     "scripts":
     {
                             "test": "proof platform win32 && proof test */*.t.js || t/test"
