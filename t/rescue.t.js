@@ -1,42 +1,23 @@
 require('proof')(3, prove)
 
 function prove (assert) {
-    var recover = require('..')
+    var rescue = require('..')
 
-    var array = recover(function (property) {
-        var error = new Error('thrown')
-        error.property = property
-        throw error
-    }, /^property:.*catch me/, function (error) {
-        assert(error.message, 'thrown', 'caught')
+    rescue(/^foo$/, function (error) {
+        assert(error.message, 'foo', 'caught message')
+    })(new Error('foo'))
+
+    var f = rescue(/^code:ENOENT$/, function (error) {
+        assert(error.code, 'ENOENT', 'caught property')
     })
+    var error = new Error
+    error.code = 'ENOENT'
+    f(error)
 
     try {
-        array[0]('catch me')
-    } catch (error) {
-        array[1](error)
-    }
-    try {
-        try {
-            array[0]('no catch')
-        } catch (error) {
-            array[1](error)
-        }
-    } catch (error) {
-        assert(error.message, 'thrown', 'rethrown')
-    }
-
-    array = recover(function (property) {
-        var error = new Error('thrown')
-        error.property = property
-        throw error
-    }, /^thrown$/, function (error) {
-        assert(error.message, 'thrown', 'message caught')
-    })
-
-    try {
-        array[0]('error')
-    } catch (error) {
-        array[1](error)
+        rescue(/^foo$/, function (error) {
+        })(new Error('bar'))
+    } catch (e) {
+        assert(e.message, 'bar', 'uncaught')
     }
 }
