@@ -1,7 +1,10 @@
 {
     "name":                 "rescue",
     "version":              "2.0.0",
-    "description":          "Catch or rethrow a Cadence exception based on a specific error property.",
+    "description":
+
+        "Catch or rethrow a Cadence exception based on a specific error property.",
+
     "keywords":
     [
                             "cadence", "control", "flow", "async"
@@ -21,7 +24,7 @@
     },
     "devDependencies":
     {
-                            "proof":                "1.x"
+                            "proof":                        "1.x"
     },
     "main":                 "rescue",
     "scripts":
