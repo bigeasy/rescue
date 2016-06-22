@@ -1,4 +1,4 @@
-require('proof')(4, prove)
+require('proof')(5, prove)
 
 function prove (assert) {
     var rescue = require('..')
@@ -26,4 +26,6 @@ function prove (assert) {
     }])(new Error('foo'))
 
     rescue(/^foo$/)(new Error('foo'))
+
+    assert(rescue(/^foo$/, 1)(new Error('foo')), 1, 'return value')
 }

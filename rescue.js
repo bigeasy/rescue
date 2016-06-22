@@ -8,7 +8,10 @@ module.exports = function (regex, rescue) {
             unshift.apply(vargs, vargs.shift())
         }
         var regex = vargs.shift()
-        var rescue = vargs.shift() || function () {}
+        var value = vargs.shift() || function () {}
+        var rescue = typeof value == 'function'
+                   ? value
+                   : function () { return value }
         var $ = /^\/\^([$\w][$\w\d]*):/.exec(regex.toString())
         if ($) {
             dispatch.push({
