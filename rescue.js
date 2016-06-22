@@ -1,8 +1,12 @@
 var slice = [].slice
+var unshift = [].unshift
 
 module.exports = function (regex, rescue) {
     var vargs = slice.call(arguments), dispatch = []
     while (vargs.length != 0) {
+        if (Array.isArray(vargs[0])) {
+            unshift.apply(vargs, vargs.shift())
+        }
         var regex = vargs.shift()
         var rescue = vargs.shift()
         var $ = /^\/\^([$\w][$\w\d]*):/.exec(regex.toString())

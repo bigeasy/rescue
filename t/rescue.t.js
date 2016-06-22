@@ -1,4 +1,4 @@
-require('proof')(3, prove)
+require('proof')(4, prove)
 
 function prove (assert) {
     var rescue = require('..')
@@ -20,4 +20,8 @@ function prove (assert) {
     } catch (e) {
         assert(e.message, 'bar', 'uncaught')
     }
+
+    rescue([/^foo$/, function (error) {
+        assert(error.message, 'foo', 'flatten array')
+    }])(new Error('foo'))
 }
