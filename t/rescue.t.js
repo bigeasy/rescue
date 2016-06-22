@@ -24,4 +24,6 @@ function prove (assert) {
     rescue([/^foo$/, function (error) {
         assert(error.message, 'foo', 'flatten array')
     }])(new Error('foo'))
+
+    rescue(/^foo$/)(new Error('foo'))
 }
