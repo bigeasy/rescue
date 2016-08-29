@@ -10,7 +10,6 @@
                             "cadence", "control", "flow", "async"
     ],
     "author":               "Alan Gutierrez <alan@prettyrobots.com>",
-    "contributors":         [],
     "homepage":             "https://github.com/bigeasy/rescue",
     "bugs":                 "https://github.com/bigeasy/rescue/issues",
     "license":              "MIT",
