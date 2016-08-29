@@ -1,4 +1,4 @@
-require('proof')(5, prove)
+require('proof/redux')(5, prove)
 
 function prove (assert) {
     var rescue = require('..')
