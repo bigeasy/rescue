@@ -1,1 +1,3 @@
-Catch or rethrow a Cadence exception based on a specific error property.
+## Rescue
+
+Catch or rethrow an exception based on a specific error property.

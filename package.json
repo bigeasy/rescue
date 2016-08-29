@@ -3,7 +3,7 @@
     "version":              "2.2.0",
     "description":
 
-      "Catch or rethrow a Cadence exception based on a specific error property.",
+      "Catch or rethrow an exception based on a specific error property.",
 
     "keywords":
     [
