@@ -7,33 +7,37 @@ module.exports = function (regex, rescue) {
         if (Array.isArray(vargs[0])) {
             unshift.apply(vargs, vargs.shift())
         }
-        var regex = vargs.shift()
+        var regexen = []
+        while (vargs[0] instanceof RegExp) {
+            var regex = vargs.shift()
+            var $ = /^\/\^([$\w][$\w\d]*):/.exec(regex.toString())
+            if ($) {
+                regexen.push({
+                    regex: regex,
+                    prefix: $[1] + ':',
+                    property: $[1]
+                })
+            } else {
+                regexen.push({
+                    regex: regex,
+                    prefix: '',
+                    property: 'message'
+                })
+            }
+        }
         var value = vargs.shift() || function () {}
         var rescue = typeof value == 'function'
                    ? value
                    : function () { return value }
-        var $ = /^\/\^([$\w][$\w\d]*):/.exec(regex.toString())
-        if ($) {
-            dispatch.push({
-                regex: regex,
-                prefix: $[1] + ':',
-                property: $[1],
-                rescue: rescue
-            })
-        } else {
-            dispatch.push({
-                regex: regex,
-                prefix: '',
-                property: 'message',
-                rescue: rescue
-            })
-        }
+        dispatch.push({ regexen: regexen, rescue: rescue })
     }
     return function (error) {
         for (var i = 0, I = dispatch.length; i < I; i++) {
-            var branch = dispatch[i]
-            if (branch.regex.test(branch.prefix + error[branch.property])) {
-                return branch.rescue.apply(this, slice.call(arguments))
+            var branch = dispatch[i], regexen = branch.regexen
+            for (var j = 0, J = regexen.length; j < J; j++) {
+                if (regexen[j].regex.test(regexen[j].prefix + error[regexen[j].property])) {
+                    return branch.rescue.apply(this, slice.call(arguments))
+                }
             }
         }
         throw error

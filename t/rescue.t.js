@@ -7,7 +7,7 @@ function prove (assert) {
         assert(error.message, 'foo', 'caught message')
     })(new Error('foo'))
 
-    var f = rescue(/^code:ENOENT$/, function (error) {
+    var f = rescue(/^code:EACCES$/, /^code:ENOENT$/, function (error) {
         assert(error.code, 'ENOENT', 'caught property')
     })
     var error = new Error
