@@ -1,4 +1,4 @@
-require('proof')(5, prove)
+require('proof')(7, prove)
 
 function prove (assert) {
     var rescue = require('..')
@@ -28,4 +28,12 @@ function prove (assert) {
     rescue(/^foo$/)(new Error('foo'))
 
     assert(rescue(/^foo$/, 1)(new Error('foo')), 1, 'return value')
+
+    var cause = new Error('cause')
+    cause.code = 'ENOENT'
+    error = new Error('error')
+    error.cause = cause
+
+    assert(rescue(/^cause:cause$/, 1)(error), 1, 'nested exception')
+    assert(rescue(/^cause.code:ENOENT$/, 1)(error), 1, 'nested exception property')
 }

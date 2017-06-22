@@ -10,7 +10,7 @@ module.exports = function (regex, rescue) {
         var regexen = []
         while (vargs[0] instanceof RegExp) {
             var regex = vargs.shift()
-            var $ = /^\/\^([$\w][$\w\d]*):/.exec(regex.toString())
+            var $ = /^\/\^([$\w][$\w\d.]*):/.exec(regex.toString())
             if ($) {
                 regexen.push({
                     regex: regex,
@@ -35,7 +35,19 @@ module.exports = function (regex, rescue) {
         for (var i = 0, I = dispatch.length; i < I; i++) {
             var branch = dispatch[i], regexen = branch.regexen
             for (var j = 0, J = regexen.length; j < J; j++) {
-                if (regexen[j].regex.test(regexen[j].prefix + error[regexen[j].property])) {
+                var value = error
+                var path = regexen[j].property.split('.')
+                while (value != null && path.length) {
+                    value = value[path[0]]
+                    path.shift()
+                }
+                if (value instanceof Error) {
+                    value = value.message
+                }
+                if (
+                    value != null &&
+                    regexen[j].regex.test(regexen[j].prefix + value)
+                ) {
                     return branch.rescue.apply(this, slice.call(arguments))
                 }
             }
