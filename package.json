@@ -16,7 +16,7 @@
     "repository":
     {
                             "type": "git",
-                            "url": "http://github.com/bigeasy/rescue.git"
+                            "url": "bigeasy/rescue"
     },
     "dependencies":
     {
