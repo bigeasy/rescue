@@ -1,7 +1,10 @@
 var Selector = require('../selector')
+var qux = new Error('qux')
+qux.cause = 1
 var bar = new Error('bar')
-bar.causes = [{ cause: new Error('qux') }]
+bar.causes = [{ cause: qux }]
 var baz = new Error('baz')
+baz.cause = { value: 1 }
 var foo = new Error('foo')
 var quux = new Error('quux')
 quux.cause = bar
