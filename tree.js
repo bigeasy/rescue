@@ -34,6 +34,6 @@ module.exports = function (e) {
     var errors = []
     return {
         errors: errors,
-        tree: tree(e, errors)
+        causes: [ tree(e, errors) ]
     }
 }

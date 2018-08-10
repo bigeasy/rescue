@@ -3,7 +3,7 @@ require('proof')(1, prove)
 function prove (okay) {
     var foo = require('./foo')
     var tree = require('../tree')
-    okay(tree(foo).tree, {
+    okay(tree(foo).causes[0], {
         index: 0,
         message: 'foo',
         causes: [{
