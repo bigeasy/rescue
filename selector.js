@@ -33,4 +33,8 @@ Selector.prototype.prune = function (path) {
     return found.length ? this._tree.errors[found.shift()] : null
 }
 
+Selector.prototype.isEmpty = function () {
+    return this._tree.causes.length == 0
+}
+
 module.exports = Selector
