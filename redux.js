@@ -10,7 +10,7 @@ function test (when, retreat) {
             property = $[1]
         } else {
             prefix = ''
-            property = message
+            property = 'message'
         }
         f = function (e) {
             var value = e[property]
@@ -41,7 +41,7 @@ function path (definition) {
 module.exports = function (cases, callback) {
     var type = 'none', seen = []
     if (!(cases[0].name != null && cases[0].when != null))  {
-        cases = { name: null, when: cases[0] }
+        cases = [{ name: null, when: cases }]
     }
     cases = cases.map(function (match, index) {
         assert(index == 0 || match.name != null, 'name must not be null')
@@ -50,7 +50,7 @@ module.exports = function (cases, callback) {
         var when = match.when.slice()
         var only = when[when.length - 1] == 'only'
         if (only) {
-            when.shift()
+            when.pop()
         }
         if (!Array.isArray(when[0])) {
             when = [ when ]

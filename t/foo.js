@@ -1,6 +1,7 @@
 var Selector = require('../selector')
 var qux = new Error('qux')
 qux.cause = 1
+qux.code = 'ENOENT'
 var bar = new Error('bar')
 bar.causes = [{ cause: qux }]
 var baz = new Error('baz')

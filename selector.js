@@ -17,7 +17,7 @@ Selector.prototype._prune = function (node, path, found) {
         if (i == node.causes.length) {
             break
         }
-        var advance = path[0](node.causes[i])
+        var advance = path[0](this._tree.errors[node.causes[i].index])
         if (advance != -1 && this._prune(node.causes[i], path.slice(advance), found)) {
             node.causes.splice(i, 1)
         } else {
