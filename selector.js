@@ -5,12 +5,12 @@ function Selector (e) {
 }
 
 Selector.prototype._prune = function (node, path, found) {
-    if (node.causes.length == 0) {
-        return false
-    }
     if (path.length == 0) {
         found.push(node.index)
         return true
+    }
+    if (node.causes.length == 0) {
+        return false
     }
     var i = 0
     for (;;) {
