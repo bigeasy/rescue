@@ -38,7 +38,7 @@ function path (definition) {
     return path
 }
 
-module.exports = function (cases) {
+module.exports = function (cases, callback) {
     var type = 'none', seen = []
     if (!(cases[0].name != null && cases[0].when != null))  {
         cases = { name: null, when: cases[0] }
@@ -75,7 +75,7 @@ module.exports = function (cases) {
             }
         }
     })
-    return function (callback) {
+    var rescuer = function (callback) {
         if (callback == null) {
             callback = function () {}
         }
@@ -89,4 +89,5 @@ module.exports = function (cases) {
             throw e
         }
     }
+    return arguments.length == 2 ? rescuer(callback) : rescuer
 }
