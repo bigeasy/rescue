@@ -1,4 +1,4 @@
-require('proof')(6, prove)
+require('proof')(7, prove)
 
 function prove (okay) {
     var rescue = require('../redux')
@@ -65,6 +65,15 @@ function prove (okay) {
             name: null,
             messages: [ 'qux' ]
         }, 'shorthand')
+    })(foo)
+    rescue(/^foo$/, function (rescued) {
+        okay({
+            name: rescued.name,
+            messages: rescued.errors.map(function (e) { return e.message })
+        }, {
+            name: null,
+            messages: [ 'foo' ]
+        }, 'shorterhand')
     })(foo)
     var rescuer = rescue([ '..', /^code:ENOENT$/ ], null)
     try {

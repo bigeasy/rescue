@@ -40,6 +40,9 @@ function path (definition) {
 
 module.exports = function (cases, callback) {
     var type = 'none', seen = []
+    if (typeof cases == 'function' || (cases instanceof RegExp)) {
+        cases = [ cases, 'only' ]
+    }
     if (!(cases[0].name != null && cases[0].when != null))  {
         cases = [{ name: null, when: cases }]
     }
