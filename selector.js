@@ -4,8 +4,8 @@ function Selector (e) {
     this._tree = tree(e)
 }
 
-Selector.prototype._prune = function (node, path, found) {
-    if (path.length == 0) {
+Selector.prototype._prune = function (node, path, index, found) {
+    if (path.length == index) {
         found.push(node.index)
         return true
     }
@@ -17,8 +17,8 @@ Selector.prototype._prune = function (node, path, found) {
         if (i == node.causes.length) {
             break
         }
-        var advance = path[0](this._tree.errors[node.causes[i].index])
-        if (advance != -1 && this._prune(node.causes[i], path.slice(advance), found)) {
+        var advance = path[index](this._tree.errors[node.causes[i].index])
+        if (advance != -1 && this._prune(node.causes[i], path, index + advance, found)) {
             node.causes.splice(i, 1)
         } else {
             i++
@@ -29,7 +29,7 @@ Selector.prototype._prune = function (node, path, found) {
 
 Selector.prototype.prune = function (path) {
     var found = []
-    this._prune(this._tree, path, found)
+    this._prune(this._tree, path, 0, found)
     return found.length ? this._tree.errors[found.shift()] : null
 }
 
