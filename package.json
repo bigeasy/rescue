@@ -1,6 +1,6 @@
 {
     "name":                 "rescue",
-    "version":              "3.3.2",
+    "version":              "4.0.0",
     "description":
 
       "Catch or rethrow an exception based on a specific error property.",
