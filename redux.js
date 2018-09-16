@@ -79,14 +79,17 @@ module.exports = function (cases, callback) {
         }
     })
     var rescuer = function (callback) {
+        var f = callback
         if (callback == null) {
-            callback = function () {}
+            f = function () {}
+        } else if (typeof callback != 'function') {
+            f = function () { return callback }
         }
         return function (e) {
             for (var i = 0, I = cases.length; i < I; i++) {
                 var rescued = cases[i].when(e)
                 if (rescued != null) {
-                    return callback(rescued)
+                    return f.call(this, rescued)
                 }
             }
             throw e
