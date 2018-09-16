@@ -1,4 +1,4 @@
-require('proof')(7, prove)
+require('proof')(8, prove)
 
 function prove (okay) {
     var rescue = require('../redux')
@@ -82,4 +82,5 @@ function prove (okay) {
         okay(e.message, 'raised', 'rethrown')
     }
     rescuer(foo) // swallowed
+    okay(rescue(/^foo$/, 'x')(foo), 'x', 'return value')
 }
