@@ -1,39 +1,86 @@
-require('proof')(7, prove)
+require('proof')(8, prove)
 
 function prove (okay) {
     var rescue = require('..')
-
-    rescue(/^foo$/, function (error) {
-        okay(error.message, 'foo', 'caught message')
-    })(new Error('foo'))
-
-    var f = rescue(/^code:EACCES$/, /^code:ENOENT$/, function (error) {
-        okay(error.code, 'ENOENT', 'caught property')
-    })
-    var error = new Error
-    error.code = 'ENOENT'
-    f(error)
-
+    var foo = require('./foo')
+    rescue([{
+        name: 'minimal',
+        when: [ function (e) { return e.message == 'foo' } ]
+    }], function (rescued) {
+        okay({
+            name: rescued.name,
+            messages: rescued.errors.map(function (e) { return e.message })
+        }, {
+            name: 'minimal',
+            messages: [ 'foo' ]
+        }, 'minimal')
+    })(foo)
+    rescue([{
+        name: 'missed',
+        when: [ /^corge$/ ]
+    }, {
+        name: 'regex',
+        when: [ /^foo$/ ]
+    }])(function (rescued) {
+        okay({
+            name: rescued.name,
+            messages: rescued.errors.map(function (e) { return e.message })
+        }, {
+            name: 'regex',
+            messages: [ 'foo' ]
+        }, 'missed and regex')
+    })(foo)
+    rescue([{
+        name: 'depth',
+        when: [ '..', /^code:ENOENT$/ ]
+    }])(function (rescued) {
+        okay({
+            name: rescued.name,
+            messages: rescued.errors.map(function (e) { return e.message })
+        }, {
+            name: 'depth',
+            messages: [ 'qux' ]
+        }, 'depth and alternate property regex')
+    })(foo)
+    rescue([{
+        name: 'missed',
+        when: [ '..', /^code:ENOENT$/, 'only' ]
+    }, {
+        name: 'depth',
+        when: [[ '..', /^code:ENOENT$/ ], [ /^foo$/, /^baz$/ ], 'only' ]
+    }])(function (rescued) {
+        okay({
+            name: rescued.name,
+            messages: rescued.errors.map(function (e) { return e.message })
+        }, {
+            name: 'depth',
+            messages: [ 'qux', 'baz' ]
+        }, 'only and mulitple')
+    })(foo)
+    rescue([ '..', /^code:ENOENT$/ ], function (rescued) {
+        okay({
+            name: rescued.name,
+            messages: rescued.errors.map(function (e) { return e.message })
+        }, {
+            name: null,
+            messages: [ 'qux' ]
+        }, 'shorthand')
+    })(foo)
+    rescue(/^foo$/, function (rescued) {
+        okay({
+            name: rescued.name,
+            messages: rescued.errors.map(function (e) { return e.message })
+        }, {
+            name: null,
+            messages: [ 'foo' ]
+        }, 'shorterhand')
+    })(foo)
+    var rescuer = rescue([ '..', /^code:ENOENT$/ ], null)
     try {
-        rescue(/^foo$/, function (error) {
-        })(new Error('bar'))
+        rescuer(new Error('raised'))
     } catch (e) {
-        okay(e.message, 'bar', 'uncaught')
+        okay(e.message, 'raised', 'rethrown')
     }
-
-    rescue([/^foo$/, function (error) {
-        okay(error.message, 'foo', 'flatten array')
-    }])(new Error('foo'))
-
-    rescue(/^foo$/)(new Error('foo'))
-
-    okay(rescue(/^foo$/, 1)(new Error('foo')), 1, 'return value')
-
-    var cause = new Error('cause')
-    cause.code = 'ENOENT'
-    error = new Error('error')
-    error.cause = cause
-
-    okay(rescue(/^cause:cause$/, 1)(error), 1, 'nested exception')
-    okay(rescue(/^cause.code:ENOENT$/, 1)(error), 1, 'nested exception property')
+    rescuer(foo) // swallowed
+    okay(rescue(/^foo$/, 'x')(foo), 'x', 'return value')
 }
