@@ -1,5 +1,4 @@
 const assert = require('assert')
-const deepEqual = require('deep-equal')
 const Selector = require('./selector')
 
 const primitives = {
