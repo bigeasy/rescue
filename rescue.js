@@ -1,99 +1,246 @@
-var assert = require('assert')
-var Selector = require('./selector')
+const assert = require('assert')
+const deepEqual = require('deep-equal')
+const Selector = require('./selector')
 
-function test (when, retreat) {
-    var f = when
-    if (when instanceof RegExp) {
-        var $ = /^\/\^([$\w][$\w\d.]*):/.exec(when.toString()), prefix, property
-        if ($) {
-            prefix = $[1] + ':'
-            property = $[1]
-        } else {
-            prefix = ''
-            property = 'message'
-        }
-        f = function (e) {
-            var value = e[property]
-            return value != null && when.test(prefix + String(value))
-        }
-    }
-    assert(typeof f == 'function', 'condition must be regex or function')
-    return function (e) { return f(e) ? 1 : retreat }
-}
-
-function path (definition) {
-    assert(Array.isArray(definition), 'when must be an array')
-    var i = 0, path = []
-    while (i < definition.length) {
-        if (definition[i] == '..') {
-            while (definition[i] == '..') {
-                i++
+const primitives = {
+    types: [ Boolean, Number, String, BigInt, Array ],
+    conditions: [
+        (when) => {
+            const conditions = [ (b) => typeof b == 'boolean' ]
+            if (typeof when[0] == 'boolean') {
+                const value = when.shift()
+                conditions.push((b) => !! b == value)
             }
-            path.push(test(definition[i], 0))
-        } else {
-            path.push(test(definition[i], -1))
+            conditions.push.apply(conditions, _functions(when))
+            assert(when.length == 0)
+            return conditions
+        },
+        (when) => {
+            const conditions = [ (n) => typeof n == 'number' ]
+            if (typeof when[0] == 'number') {
+                const value = when.shift()
+                conditions.push((n) => n == value)
+            } else if (
+                Array.isArray(when[0]) &&
+                when[0].map((n) => typeof n == 'number').length == 2
+            ) {
+                const range = when.shift()
+                conditions.push((n) => range[0] <= n && n <= range[1])
+            }
+            conditions.push.apply(conditions, _functions(when))
+            assert(when.length == 0)
+            return conditions
+        },
+        (when) => {
+            const conditions = [ (s) => typeof s == 'string' ]
+            if (typeof when[0] == 'string') {
+                const value = when.shift()
+                conditions.push((s) => s.toString() == value)
+            } else if (when[0] instanceof RegExp) {
+                const regex = when.shift()
+                conditions.push((s) => regex.test(s.toString()))
+                assert(when.length == 0)
+            }
+            conditions.push.apply(conditions, _functions(when))
+            assert(when.length == 0)
+            return conditions
+        },
+        (when) => {
+            const conditions =  [ (n) => typeof n == 'bigint' ]
+            if (typeof when[0] == 'bigint') {
+                const value = when.shift()
+                conditions.push((n) => n == value)
+            } else if (
+                Array.isArray(when[0]) &&
+                when[0].map((n) => typeof n == 'bigint').length == 2
+            ) {
+                const range = when.shift()
+                conditions.push((n) => range[0] <= n && n <= range[1])
+            }
+            conditions.push.apply(conditions, _functions(when))
+            assert(when.length == 0)
+            return conditions
+        },
+        (when) => {
+            const conditions =  [ (a) => Array.isArray(a) ]
+            if (Array.isArray(when[0])) {
+                const value = when.shift()
+                conditions.push((a) =>  a.filter((v, i) => value[i] == v).length == value.length)
+            }
+            conditions.push.apply(conditions, _functions(when))
+            assert(when.length == 0)
+            return conditions
         }
-        i++
-    }
-    return path
+    ]
 }
 
-module.exports = function (cases, callback) {
-    var type = 'none', seen = []
-    if (typeof cases == 'function' || (cases instanceof RegExp)) {
-        cases = [ cases, 'only' ]
+function _only (when) {
+    if (typeof when[0] == 'boolean') {
+        return when.shift()
     }
-    if (!(cases[0].name != null && cases[0].when != null))  {
-        cases = [{ name: null, when: cases }]
+    return true
+}
+
+function _dive (when) {
+    if (typeof when[0] == 'number') {
+        const dive = when.shift()
+        return [ dive, dive ]
     }
-    cases = cases.map(function (match, index) {
-        assert(index == 0 || match.name != null, 'name must not be null')
-        assert(!~seen.indexOf(match.name), 'duplicate name')
-        seen.push(match.name)
-        var when = match.when.slice()
-        var only = when[when.length - 1] == 'only'
-        if (only) {
-            when.pop()
+    if (
+        Array.isArray(when[0]) &&
+        when[0].filter((n) => typeof n == 'number').length == 2
+    ) {
+        return when.shift()
+    }
+    return [ 0, Infinity ]
+}
+
+function _type (when) {
+    if (
+        typeof when[0] == 'function' &&
+        when[0].prototype != null &&
+        typeof when[0].prototype == 'object'
+    ) {
+        return when.shift()
+    }
+    return Error
+}
+
+function _string (when, type) {
+    if (typeof when[0] == 'string') {
+        const string = when.shift()
+        if (type.prototype instanceof Error || type === Error) {
+            return [ (e) => e.message == string ]
         }
-        if (!Array.isArray(when[0])) {
-            when = [ when ]
+        return [ (o) => o.toString() == string ]
+    } else if (when[0] instanceof RegExp) {
+        const regex = when.shift()
+        if (type.prototype instanceof Error || type === Error) {
+            return [ (e) => regex.test(e.message) ]
         }
-        when = when.map(path)
-        return {
-            name: match.name,
-            when: function (e) {
-                var selector = new Selector(e)
-                var errors = []
-                for (var i = 0, I = when.length; i < I; i++) {
-                    var error = selector.prune(when[i])
-                    if (error == null) {
+        return [ (o) => regex.test(o.toString()) ]
+    }
+    return []
+}
+
+function _properties (when) {
+    if (typeof when[0] == 'object' && !Array.isArray(when[0])) {
+        const properties = when.shift()
+        return [ (o) => {
+            for (const property in properties) {
+                if (properties[property] instanceof RegExp) {
+                    if (!properties[property].test(o[property])) {
+                        return false
+                    }
+                } else {
+                    if (properties[property] != o[property]) {
+                        return false
+                    }
+                }
+            }
+            return true
+        } ]
+    }
+    return []
+}
+
+function _functions (when) {
+    const functions = []
+    for (;;) {
+        if (
+            typeof when[0] == 'function' &&
+            (
+                when[0].prototype == null ||
+                typeof when[0].prototype != 'object'
+            )
+        ) {
+            functions.push(when.shift())
+        } else {
+            return functions
+        }
+    }
+}
+
+function _callback (vargs) {
+    if (typeof vargs[0] == 'function') {
+        return vargs.shift()
+    }
+    if (vargs.length != 0 && !Array.isArray(vargs[0])) {
+        const result = vargs.shift()
+        return () => result
+    }
+    return () => {}
+}
+
+module.exports = function (error, ...vargs) {
+    const cases = []
+    if (vargs.length == 1) {
+        if (
+            Array.isArray(vargs[0]) &&
+            Array.isArray(vargs[0][0]) &&
+            (
+                vargs[0][0].length != 2
+                ||
+                vargs[0][0].filter((n) => typeof n == 'number').length != 2
+            )
+        ) {
+            vargs = vargs[0]
+        }
+    }
+    while (vargs.length) {
+        const parts = [{ dive: [ 0, Infinity ] }]
+        const when = vargs.shift()
+        const only = _only(when)
+        while (when.length) {
+            const conditions = []
+            parts[parts.length - 1].dive = _dive(when)
+            const type = _type(when)
+            const index = primitives.types.indexOf(type)
+            if (~index) {
+                conditions.push.apply(conditions, primitives.conditions[index](when))
+            } else {
+                conditions.push((e) => e instanceof type)
+                conditions.push.apply(conditions, _string(when, type))
+                conditions.push.apply(conditions, _properties(when))
+                conditions.push.apply(conditions, _functions(when))
+            }
+            parts.push({ dive: [ 0, 1 ], conditions: conditions })
+        }
+        const callback = _callback(vargs)
+        const path = []
+        for (let i = 1, I = parts.length; i < I; i++) {
+            const { dive, conditions } = parts[i]
+            path.push((e) => {
+                for (const condition of conditions) {
+                    if (!condition(e)) {
                         return null
                     }
-                    errors.push(error)
                 }
-                if (only && !selector.isEmpty()) {
-                    return null
-                }
-                return { name: match.name, errors: errors }
-            }
+                return dive
+            })
         }
-    })
-    var rescuer = function (callback) {
-        var f = callback
-        if (callback == null) {
-            f = function () {}
-        } else if (typeof callback != 'function') {
-            f = function () { return callback }
-        }
-        return function (e) {
-            for (var i = 0, I = cases.length; i < I; i++) {
-                var rescued = cases[i].when(e)
-                if (rescued != null) {
-                    return f.call(this, rescued)
+        const dive = parts[0].dive
+        cases.push({
+            test: (error) => {
+                const selector = new Selector(error)
+                const errors = []
+                const found = selector.prune(path, dive)
+                if (found.length != 0) {
+                    if (only) {
+                       return found.length == 1 ? found.shift() : null
+                    }
+                    return found
                 }
-            }
-            throw e
+                return null
+            },
+            callback: callback
+        })
+    }
+    for (var i = 0, I = cases.length; i < I; i++) {
+        const found = cases[i].test(error)
+        if (found != null) {
+            return cases[i].callback(found)
         }
     }
-    return arguments.length == 2 ? rescuer(callback) : rescuer
+    throw error
 }

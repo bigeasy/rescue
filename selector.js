@@ -1,40 +1,59 @@
-var tree = require('./tree')
+const tree = require('./tree')
 
-function Selector (e) {
-    this._tree = tree(e)
-}
+class Selector {
+    constructor (e) {
+        this._tree = tree(e)
+        this._found = []
+    }
 
-Selector.prototype._prune = function (node, path, index, found) {
-    if (path.length == index) {
-        found.push(node.index)
-        return true
-    }
-    if (node.causes.length == 0) {
-        return false
-    }
-    var i = 0
-    for (;;) {
-        if (i == node.causes.length) {
-            break
-        }
-        var advance = path[index](this._tree.errors[node.causes[i].index])
-        if (advance != -1 && this._prune(node.causes[i], path, index + advance, found)) {
+    _dip (node, i, path, index, depth, dive) {
+        if (this._prune(node.causes[i], path, index, depth + 1, dive)) {
             node.causes.splice(i, 1)
-        } else {
-            i++
+            return i
         }
+        return i + 1
     }
-    return node.causes.length == 0
-}
 
-Selector.prototype.prune = function (path) {
-    var found = []
-    this._prune(this._tree, path, 0, found)
-    return found.length ? this._tree.errors[found.shift()] : null
-}
+    _prune (node, path, index, depth, dive) {
+        if (path.length == index) {
+            this._found.push(node.index)
+            return true
+        }
+        if (depth > dive[1] || node.causes.length == 0) {
+            return false
+        }
+        let i = 0
+        for (;;) {
+            if (i == node.causes.length) {
+                break
+            }
+            if (depth < dive[0]) {
+                i = this._dip(node, i, path, index, depth, dive)
+            } else {
+                const match = path[index](this._tree.errors[node.causes[i].index])
+                if (match == null) {
+                    i = this._dip(node, i, path, index, depth, dive)
+                } else {
+                    const subDive = match.map(offset => index + offset + 1)
+                    if (this._prune(node.causes[i], path, index + 1, depth + 1, subDive)) {
+                        node.causes.splice(i, 1)
+                    } else {
+                        i++
+                    }
+                }
+            }
+        }
+        return node.causes.length == 0
+    }
 
-Selector.prototype.isEmpty = function () {
-    return this._tree.causes.length == 0
+    prune (path, dive) {
+        this._prune(this._tree, path, 0, 0, dive)
+        return this._found.map((index) => this._tree.errors[index])
+    }
+
+    get empty () {
+        return this._tree.causes.length == 0
+    }
 }
 
 module.exports = Selector
