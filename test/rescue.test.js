@@ -1,37 +1,36 @@
-describe('rescue', () => {
-    const assert = require('assert')
+require('proof')(37, async (okay) => {
     const Root = { Error: class extends Error {} }
     const Sought = { Error: class extends Error {} }
     const Other = { Error: class extends Error {} }
     const rescue = require('..')
-    it('can match by error type', () => {
+    {
         const test = []
         try {
             throw new Sought.Error('error')
         } catch (error) {
             rescue(error, [ Sought.Error ], error => test.push(error.message))
         }
-        assert.deepStrictEqual(test, [ 'error' ], 'rescued')
-    })
-    it('can return a value instead of call a funtion', () => {
+        okay(test, [ 'error' ], 'error by type')
+    }
+    {
         const test = []
         try {
             throw new Sought.Error('error')
         } catch (error) {
             test.push(rescue(error, [ Sought.Error ], true))
         }
-        assert.deepStrictEqual(test, [ true ], 'rescued')
-    })
-    it('can swallow errors', () => {
+        okay(test, [ true ], 'return value instead of calling a function')
+    }
+    {
         const test = []
         try {
             throw new Sought.Error('error')
         } catch (error) {
             test.push(rescue(error, [ Sought.Error ]))
         }
-        assert.deepStrictEqual(test, [ undefined ], 'rescued')
-    })
-    it('can rethrow', () => {
+        okay(test, [ undefined ], 'swallow errors')
+    }
+    {
         const test = []
         try {
             try {
@@ -42,9 +41,9 @@ describe('rescue', () => {
         } catch (error) {
             test.push(error.message)
         }
-        assert.deepStrictEqual(test, [ 'other' ], 'rescued')
-    })
-    it('can match only', () => {
+        okay(test, [ 'other' ], 'rethrow')
+    }
+    {
         const test = []
         try {
             try {
@@ -57,9 +56,9 @@ describe('rescue', () => {
         } catch (error) {
             test.push(error.message)
         }
-        assert.deepStrictEqual(test, [ 'root' ], 'rescued')
-    })
-    it('can match many', () => {
+        okay(test, [ 'root' ], 'match only')
+    }
+    {
         const test = []
         try {
             const error = new Error('root')
@@ -70,9 +69,9 @@ describe('rescue', () => {
                 errors.map(error => test.push(error.message))
             })
         }
-        assert.deepStrictEqual(test, [ 'error', 'error' ], 'rescued')
-    })
-    it('can at specific depth', () => {
+        okay(test, [ 'error', 'error' ], 'match many')
+    }
+    {
         const test = []
         try {
             const error = new Error('error')
@@ -81,9 +80,9 @@ describe('rescue', () => {
         } catch (error) {
             rescue(error, [ 1, 'error' ], error => test.push(!! error.causes))
         }
-        assert.deepStrictEqual(test, [ false ], 'rescued')
-    })
-    it('can at match at a range of depth depth', () => {
+        okay(test, [ false ], 'specific depth')
+    }
+    {
         const test = []
         try {
             const error = new Error('error')
@@ -92,27 +91,27 @@ describe('rescue', () => {
         } catch (error) {
             rescue(error, [ [ 1, 2 ], 'error' ], error => test.push(!! error.causes))
         }
-        assert.deepStrictEqual(test, [ false ], 'rescued')
-    })
-    it('can match an error message', () => {
+        okay(test, [ false ], 'match range of depth')
+    }
+    {
         const test = []
         try {
             throw new Error('error')
         } catch (error) {
             rescue(error, [ 'error' ], error => test.push(error.message))
         }
-        assert.deepStrictEqual(test, [ 'error' ], 'rescued')
-    })
-    it('can match an error message regex', () => {
+        okay(test, [ 'error' ], 'match error message')
+    }
+    {
         const test = []
         try {
             throw new Error('error')
         } catch (error) {
             rescue(error, [ /^error$/ ], error => test.push(error.message))
         }
-        assert.deepStrictEqual(test, [ 'error' ], 'rescued')
-    })
-    it('can match a property', () => {
+        okay(test, [ 'error' ], 'match error message by regex')
+    }
+    {
         const test = []
         try {
             const error = new Error('error')
@@ -121,9 +120,9 @@ describe('rescue', () => {
         } catch (error) {
             rescue(error, [{ code: 'ENOENT' }], error => test.push(error.message))
         }
-        assert.deepStrictEqual(test, [ 'error' ], 'rescued')
-    })
-    it('can mismatch a property', () => {
+        okay(test, [ 'error' ], 'match property')
+    }
+    {
         const test = []
         try {
             try {
@@ -136,9 +135,9 @@ describe('rescue', () => {
         } catch (error) {
             test.push(error.message)
         }
-        assert.deepStrictEqual(test, [ 'error' ], 'missed')
-    })
-    it('can match a property regex', () => {
+        okay(test, [ 'error' ], 'mismatch property')
+    }
+    {
         const test = []
         try {
             const error = new Error('error')
@@ -147,9 +146,9 @@ describe('rescue', () => {
         } catch (error) {
             rescue(error, [{ code: /^ENOENT$/ }], error => test.push(error.message))
         }
-        assert.deepStrictEqual(test, [ 'error' ], 'rescued')
-    })
-    it('can mismatch a property regex', () => {
+        okay(test, [ 'error' ], 'match property by regex')
+    }
+    {
         const test = []
         try {
             try {
@@ -162,9 +161,9 @@ describe('rescue', () => {
         } catch (error) {
             test.push(error.message)
         }
-        assert.deepStrictEqual(test, [ 'error' ], 'missed')
-    })
-    it('can match on a function', () => {
+        okay(test, [ 'error' ], 'mismatch a property by regex')
+    }
+    {
         const test = []
         try {
             throw new Error('error')
@@ -173,9 +172,9 @@ describe('rescue', () => {
             f.prototype = 1
             rescue(error, [ f ], error => test.push(error.message))
         }
-        assert.deepStrictEqual(test, [ 'error' ], 'rescued')
-    })
-    it('can dive for errors', () => {
+        okay(test, [ 'error' ], 'match on function')
+    }
+    {
         const test = []
         try {
             try {
@@ -188,18 +187,18 @@ describe('rescue', () => {
         } catch (error) {
             rescue(error, [ Sought.Error ], (error) => test.push(error.message))
         }
-        assert.deepStrictEqual(test, [ 'sought' ], 'rescued')
-    })
-    it('can accept matches in an array', () => {
+        okay(test, [ 'sought' ], 'dive for errors')
+    }
+    {
         const test = []
         try {
             throw new Error('error')
         } catch (error) {
             rescue(error, [[ [ 0, 0 ], 'error' ], (error) => test.push(error.message) ])
         }
-        assert.deepStrictEqual(test, [ 'error' ], 'rescued')
-    })
-    it('can accept multiple matches in an array', () => {
+        okay(test, [ 'error' ], 'accept matches in an array')
+    }
+    {
         const test = []
         try {
             throw new Error('error')
@@ -209,9 +208,9 @@ describe('rescue', () => {
                 [ 'error' ], (error) => test.push(error.message)
             ])
         }
-        assert.deepStrictEqual(test, [ 'error' ], 'rescued')
-    })
-    it('can match a toString value of an arbitrary object', () => {
+        okay(test, [ 'error' ], 'accept multiple matches in an array')
+    }
+    {
         const test = []
         try {
             throw new RegExp('a')
@@ -219,9 +218,9 @@ describe('rescue', () => {
             debugger
             rescue(error, [ RegExp, '/a/' ], (object) => test.push(String(object)))
         }
-        assert.deepStrictEqual(test, [ '/a/' ], 'rescued')
-    })
-    it('can regex match a toString value of an arbitrary object', () => {
+        okay(test, [ '/a/' ], 'match toString value of an arbitrary object')
+    }
+    {
         const test = []
         try {
             throw new RegExp('a')
@@ -229,27 +228,27 @@ describe('rescue', () => {
             debugger
             rescue(error, [ RegExp, /^\/a\/$/ ], (object) => test.push(String(object)))
         }
-        assert.deepStrictEqual(test, [ '/a/' ], 'rescued')
-    })
-    it('can match an boolean exception', function () {
+        okay(test, [ '/a/' ], 'regex match a toString value of an arbitrary object')
+    }
+    {
         const test = []
         try {
             throw true
         } catch (error) {
             rescue(error, [ Boolean ], (b) => test.push(b))
         }
-        assert.deepStrictEqual(test, [ true ], 'rescued')
-    })
-    it('can match an boolean exception by value', function () {
+        okay(test, [ true ], 'match boolean exception')
+    }
+    {
         const test = []
         try {
             throw true
         } catch (error) {
             rescue(error, [ Boolean, true ], (b) => test.push(b))
         }
-        assert.deepStrictEqual(test, [ true ], 'rescued')
-    })
-    it('can mismatch an boolean exception by value', function () {
+        okay(test, [ true ], 'match boolean exception by value')
+    }
+    {
         const test = []
         try {
             try {
@@ -260,108 +259,108 @@ describe('rescue', () => {
         } catch (error) {
             test.push(error)
         }
-        assert.deepStrictEqual(test, [ false ], 'missed')
-    })
-    it('can match a number exception', function () {
+        okay(test, [ false ], 'mismatch boolean exception by value')
+    }
+    {
         const test = []
         try {
             throw 1
         } catch (error) {
             rescue(error, [ Number ], (n) => test.push(n))
         }
-        assert.deepStrictEqual(test, [ 1 ], 'rescued')
-    })
-    it('can match a number exception by value', function () {
+        okay(test, [ 1 ], 'match number exception')
+    }
+    {
         const test = []
         try {
             throw 1
         } catch (error) {
             rescue(error, [ Number, 1 ], (n) => test.push(n))
         }
-        assert.deepStrictEqual(test, [ 1 ], 'rescued')
-    })
-    it('can match a number exception by range', function () {
+        okay(test, [ 1 ], 'match a number exception by value')
+    }
+    {
         const test = []
         try {
             throw 1
         } catch (error) {
             rescue(error, [ Number, [ 0, 1 ] ], (n) => test.push(n))
         }
-        assert.deepStrictEqual(test, [ 1 ], 'rescued')
-    })
-    it('can match a string exception', function () {
+        okay(test, [ 1 ], 'match a number exception by range')
+    }
+    {
         const test = []
         try {
             throw 'error'
         } catch (error) {
             rescue(error, [ String ], (s) => test.push(s))
         }
-        assert.deepStrictEqual(test, [ 'error' ], 'rescued')
-    })
-    it('can match a string exception by value', function () {
+        okay(test, [ 'error' ], 'match a string exception')
+    }
+    {
         const test = []
         try {
             throw 'error'
         } catch (error) {
             rescue(error, [ String, 'error' ], (s) => test.push(s))
         }
-        assert.deepStrictEqual(test, [ 'error' ], 'rescued')
-    })
-    it('can match a string exception by regex', function () {
+        okay(test, [ 'error' ], 'match string exception by value')
+    }
+    {
         const test = []
         try {
             throw 'error'
         } catch (error) {
             rescue(error, [ String, /^error$/ ], (n) => test.push(n))
         }
-        assert.deepStrictEqual(test, [ 'error' ], 'rescued')
-    })
-    it('can match a bigint exception', function () {
+        okay(test, [ 'error' ], 'match string exception by regex')
+    }
+    {
         const test = []
         try {
             throw 1n
         } catch (error) {
             rescue(error, [ BigInt ], (n) => test.push(n))
         }
-        assert.deepStrictEqual(test, [ 1n ], 'rescued')
-    })
-    it('can match a bigint exception by value', function () {
+        okay(test, [ 1n ], 'match a bigint exception')
+    }
+    {
         const test = []
         try {
             throw 1n
         } catch (error) {
             rescue(error, [ BigInt, 1n ], (n) => test.push(n))
         }
-        assert.deepStrictEqual(test, [ 1n ], 'rescued')
-    })
-    it('can match a bigint exception by range', function () {
+        okay(test, [ 1n ], 'match a bigint exception by value')
+    }
+    {
         const test = []
         try {
             throw 1n
         } catch (error) {
             rescue(error, [ BigInt, [ 0n, 1n ] ], (n) => test.push(n))
         }
-        assert.deepStrictEqual(test, [ 1n ], 'rescued')
-    })
-    it('can match an array exception', function () {
+        okay(test, [ 1n ], 'match a bigint exception by range')
+    }
+    {
         const test = []
         try {
             throw [ 1, 'a' ]
         } catch (error) {
             rescue(error, [ Array ], (a) => test.push(a))
         }
-        assert.deepStrictEqual(test, [ [ 1, 'a' ] ], 'rescued')
-    })
-    it('can match an array exception by shallow compare', function () {
+        okay(test, [ [ 1, 'a' ] ], 'match an array exception')
+    }
+    {
         const test = []
         try {
             throw [ 1, 'a' ]
         } catch (error) {
             rescue(error, [ Array, [ 1, 'a' ] ], (a) => test.push(a))
         }
-        assert.deepStrictEqual(test, [ [ 1, 'a' ] ], 'rescued')
-    })
-    it('can mismatch an array exception by shallow compare', function () {
+        okay(test, [ [ 1, 'a' ] ], 'match an array exception by shallow compare')
+    }
+    {
         const test = []
         try {
             try {
@@ -372,14 +371,14 @@ describe('rescue', () => {
         } catch (error) {
             test.push(error)
         }
-        assert.deepStrictEqual(test, [ [ 1, 'a' ] ], 'missed')
-    })
-    it('can return async functions', async () => {
+        okay(test, [ [ 1, 'a' ] ], 'mismatch an array exception by shallow compare')
+    }
+    {
         const result = await rescue(new Error('error'), [ Error ], async (e) => e.message)
-        assert.equal(result, 'error')
-    })
-    it('can return sync results async', async () => {
+        okay(result, 'await async function')
+    }
+    {
         const result = await rescue(new Error('error'), [ Error ], (e) => e.message)
-        assert.equal(result, 'error')
-    })
+        okay(result, 'away sync function as async')
+    }
 })

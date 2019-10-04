@@ -1,61 +1,61 @@
-describe('selector', () => {
-    const assert = require('assert')
+require('proof')(2, (okay) => {
     const Selector = require('../selector')
     const foo = require('./foo')
-    it('can prune', () => {
+    {
         const selector = new Selector(foo)
         const found = selector.prune([() => null], [ 0, Infinity ])
-        assert.deepStrictEqual(found, [], 'missing')
-        assert(!selector.empty, 'still has errors')
-    })
-    it('can descend and match', () => {
+        okay(found, [], 'prune missing')
+        okay(!selector.empty, 'prune still has errors')
+    }
+    return
+    {
         const selector = new Selector(foo)
         const found = selector.prune([(e) => e.message == 'baz' ? [ 0, 1 ] : null ], [ 0, Infinity ])
-        assert.deepStrictEqual(found.map(e => e.message), [ 'baz' ], 'found')
-        assert(!selector.empty, 'still has errors')
-    })
-    it('can match root', () => {
+        okay(found.map(e => e.message), [ 'baz' ], 'descend and match found')
+        okay(!selector.empty, 'descend and match still has errors')
+    }
+    {
         const selector = new Selector(foo)
         const found = selector.prune([
             (e) => e.message == 'foo' ? [ 0, 1 ] : null
         ], [ 0, 1 ])
-        assert.deepStrictEqual(found.map(e => e.message), [ 'foo' ], 'found')
-        assert(selector.empty, 'matched all errors')
-    })
-    it('can match at a depth', () => {
+        okay(found.map(e => e.message), [ 'foo' ], 'match route found')
+        okay(selector.empty, 'match route matched all errors')
+    }
+    {
         const selector = new Selector(foo)
         const found = selector.prune([(e) => e.message == 'baz' ? [ 0, 1 ] : null ], [ 0, 1 ])
-        assert.deepStrictEqual(found.map(e => e.message), [ 'baz' ], 'found')
-        assert(!selector.empty, 'still has errors')
-    })
-    it('can fail to match because depth range', () => {
+        okay(found.map(e => e.message), [ 'baz' ], 'match at a depth found')
+        okay(!selector.empty, 'match at a depth still has errors')
+    }
+    {
         const selector = new Selector(foo)
         const found = selector.prune([(e) => e.message == 'baz' ? [ 0, 1 ] : null ], [ 0, 0 ])
-        assert.deepStrictEqual(found.map(e => e.message), [], 'missing')
-        assert(!selector.empty, 'still has errors')
-    })
-    it('can skip to a particular depth', () => {
+        okay(found.map(e => e.message), [], 'fail to match because depth range missing')
+        okay(!selector.empty, 'fail to match because depth range still has errors')
+    }
+    {
         const selector = new Selector(foo)
         const found = selector.prune([(e) => e.message == 'baz' ? [ 0, 1 ] : null ], [ 1, 1 ])
-        assert.deepStrictEqual(found.map(e => e.message), [ 'baz' ], 'found')
-        assert(!selector.empty, 'still has errors')
-    })
-    it('can match nested', () => {
+        okay(found.map(e => e.message), [ 'baz' ], 'skip to a particular depth found')
+        okay(!selector.empty, 'skip to a particular depth still has errors')
+    }
+    {
         const selector = new Selector(foo)
         const found = selector.prune([
             (e) => e.message == 'bar' ? [ 0, Infinity ] : null,
             (e) => e.message == 'qux' ? [ 0, 1 ] : null
         ], [ 0, 1 ])
-        assert.deepStrictEqual(found.map(e => e.message), [ 'qux' ], 'found')
-        assert(!selector.empty, 'still has errors')
-    })
-    it('can match nested after skip', () => {
+        okay(found.map(e => e.message), [ 'qux' ], 'match nested found')
+        okay(!selector.empty, 'match nested still has errors')
+    }
+    {
         const selector = new Selector(foo)
         const found = selector.prune([
             (e) => e.message == 'foo' ? [ 2, 2 ] : null,
             (e) => e.message == 'qux' ? [ 0, 1 ] : null
         ], [ 0, 1 ])
-        assert.deepStrictEqual(found.map(e => e.message), [ 'qux' ], 'found')
-        assert(!selector.empty, 'still has errors')
-    })
+        okay(found.map(e => e.message), [ 'qux' ], 'match nested after skip found')
+        okay(!selector.empty, 'match nested after skip still has errors')
+    }
 })
