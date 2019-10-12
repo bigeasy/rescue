@@ -1,4 +1,4 @@
-require('proof')(2, (okay) => {
+require('proof')(16, (okay) => {
     const Selector = require('../selector')
     const foo = require('./foo')
     {
@@ -7,7 +7,6 @@ require('proof')(2, (okay) => {
         okay(found, [], 'prune missing')
         okay(!selector.empty, 'prune still has errors')
     }
-    return
     {
         const selector = new Selector(foo)
         const found = selector.prune([(e) => e.message == 'baz' ? [ 0, 1 ] : null ], [ 0, Infinity ])
