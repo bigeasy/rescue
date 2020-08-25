@@ -160,6 +160,20 @@ function _functions (when) {
     }
 }
 
+function _boolean (when) {
+    const booleans = []
+    for (;;) {
+        if (
+            typeof when[0] == 'boolean'
+        ) {
+            const value = when.shift()
+            booleans.push(() => value)
+        } else {
+            return booleans
+        }
+    }
+}
+
 function _callback (vargs) {
     if (typeof vargs[0] == 'function') {
         return vargs.shift()
@@ -204,6 +218,7 @@ module.exports = function (error, ...vargs) {
                 conditions.push.apply(conditions, _string(when, type))
                 conditions.push.apply(conditions, _properties(when))
                 conditions.push.apply(conditions, _functions(when))
+                conditions.push.apply(conditions, _boolean(when))
             }
             parts.push({ dive: [ 0, 1 ], conditions: conditions })
         }

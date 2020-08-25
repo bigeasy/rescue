@@ -1,4 +1,4 @@
-require('proof')(37, async (okay) => {
+require('proof')(39, async (okay) => {
     const Root = { Error: class extends Error {} }
     const Sought = { Error: class extends Error {} }
     const Other = { Error: class extends Error {} }
@@ -101,6 +101,28 @@ require('proof')(37, async (okay) => {
             rescue(error, [ 'error' ], error => test.push(error.message))
         }
         okay(test, [ 'error' ], 'match error message')
+    }
+    {
+        const test = []
+        try {
+            throw new Error('error')
+        } catch (error) {
+            rescue(error, [ true ], error => test.push(error.message))
+        }
+        okay(test, [ 'error' ], 'arbitrary boolean true')
+    }
+    {
+        const test = []
+        try {
+            try {
+                throw new Error('error')
+            } catch (error) {
+                rescue(error, [ false ], error => test.push('unexpected'))
+            }
+        } catch (error) {
+            test.push(error.message)
+        }
+        okay(test, [ 'error' ], 'arbitrary boolean false')
     }
     {
         const test = []
