@@ -65,7 +65,7 @@ require('proof')(37, async (okay) => {
             error.causes = [ new Error('error'), new Error('error') ]
             throw error
         } catch (error) {
-            rescue(error, [ false, 'error' ], errors => {
+            rescue(error, [ 'error' ], [], errors => {
                 errors.map(error => test.push(error.message))
             })
         }

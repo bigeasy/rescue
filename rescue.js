@@ -189,7 +189,9 @@ module.exports = function (error, ...vargs) {
     while (vargs.length) {
         const parts = [{ dive: [ 0, Infinity ] }]
         const when = vargs.shift()
-        const only = _only(when)
+        const only = vargs.length != 0 && Array.isArray(vargs[0]) && vargs[0].length == 0
+            ? ! vargs.shift()
+            : true
         while (when.length) {
             const conditions = []
             parts[parts.length - 1].dive = _dive(when)
