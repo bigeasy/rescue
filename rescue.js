@@ -178,7 +178,7 @@ function _callback (vargs) {
     return () => {}
 }
 
-module.exports = function (error, ...vargs) {
+function check (error, vargs) {
     const cases = []
     if (vargs.length == 1) {
         if (
@@ -245,11 +245,32 @@ module.exports = function (error, ...vargs) {
             callback: callback
         })
     }
-    for (var i = 0, I = cases.length; i < I; i++) {
+    for (let i = 0, I = cases.length; i < I; i++) {
         const found = cases[i].test(error)
         if (found != null) {
             return cases[i].callback(found)
         }
     }
     throw error
+}
+
+module.exports = function (error, ...vargs) {
+    if (typeof error == 'function') {
+        try {
+            error = error()
+            if (Promise.resolve(error) === error) {
+                return async function () {
+                    try {
+                        return await error
+                    } catch (error) {
+                        return check(error, vargs)
+                    }
+                } ()
+            }
+            return error
+        } catch (error) {
+            return check(error, vargs)
+        }
+    }
+    return check(error, vargs)
 }

@@ -1,4 +1,4 @@
-require('proof')(39, async (okay) => {
+require('proof')(42, async (okay) => {
     const Root = { Error: class extends Error {} }
     const Sought = { Error: class extends Error {} }
     const Other = { Error: class extends Error {} }
@@ -402,5 +402,23 @@ require('proof')(39, async (okay) => {
     {
         const result = await rescue(new Error('error'), [ Error ], (e) => e.message)
         okay(result, 'away sync function as async')
+    }
+    {
+        rescue(function () {
+            throw new Sought.Error
+        }, [ Sought.Error ])
+        okay('rescued sync block')
+    }
+    {
+        const one = rescue(function () {
+            return 1
+        }, [ Sought.Error ])
+        okay(one, 1, 'returned sync block')
+    }
+    {
+        rescue(async function () {
+            throw new Sought.Error
+        }, [ Sought.Error ])
+        okay('rescued async block')
     }
 })
