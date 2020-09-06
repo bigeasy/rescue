@@ -73,13 +73,6 @@ const primitives = {
     ]
 }
 
-function _only (when) {
-    if (typeof when[0] == 'boolean') {
-        return when.shift()
-    }
-    return true
-}
-
 function _dive (when) {
     if (typeof when[0] == 'number') {
         const dive = when.shift()
