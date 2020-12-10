@@ -1,3 +1,5 @@
+// Where is `or`? Search for "`or`" in this file.
+
 const assert = require('assert')
 const Selector = require('./selector')
 
@@ -167,6 +169,18 @@ function _boolean (when) {
     }
 }
 
+// **TODO** Here you're using a new array to indicate that the current match
+// should just return undefined, but it looks like you could stick another
+// non-empty array and implement `or`.
+
+// As it stands you kind of have `or` already, if you want to just swallow an
+// exception. You can or property tests using alternation in a regex.
+
+// Hmm... Okay so the rule could be match this or that and do this. To match
+// this or that and to this, or match this or that and do nothing, you can put
+// nothing at the end of the list.
+
+//
 function _callback (vargs) {
     if (typeof vargs[0] == 'function') {
         return vargs.shift()
@@ -194,6 +208,7 @@ function check (error, vargs) {
         }
     }
     while (vargs.length) {
+        const ors = []
         const parts = [{ dive: [ 0, Infinity ] }]
         const when = vargs.shift()
         const only = vargs.length != 0 && Array.isArray(vargs[0]) && vargs[0].length == 0
@@ -245,13 +260,15 @@ function check (error, vargs) {
             callback: callback
         })
     }
-    for (let i = 0, I = cases.length; i < I; i++) {
-        const found = cases[i].test(error)
-        if (found != null) {
-            return cases[i].callback(found)
+    return function (error) {
+        for (let i = 0, I = cases.length; i < I; i++) {
+            const found = cases[i].test(error)
+            if (found != null) {
+                return cases[i].callback(found)
+            }
         }
+        throw error
     }
-    throw error
 }
 
 module.exports = function (error, ...vargs) {

@@ -1,8 +1,38 @@
-require('proof')(42, async (okay) => {
+require('proof')(44, async (okay) => {
     const Root = { Error: class extends Error {} }
     const Sought = { Error: class extends Error {} }
     const Other = { Error: class extends Error {} }
     const rescue = require('..')
+    {
+        const test = []
+        try {
+            throw new Other.Error('error')
+        } catch (error) {
+            test.push(rescue(error, [ Sought.Error ], [ Other.Error ]))
+        }
+        okay(test, [ undefined ], 'catch this or that')
+    }
+    {
+        const test = []
+        try {
+            throw new Sought.Error('error')
+        } catch (error) {
+            test.push(rescue(error, [ Sought.Error ], true, [ Other.Error ], true))
+        }
+        okay(test, [ undefined ], 'catch this or that')
+    }
+    {
+        const test = []
+        try {
+            const sought = new Sought.Error('sought')
+            const other = new Other.Error('other')
+            sought.causes = [ other ]
+            throw sought
+        } catch (error) {
+            test.push(rescue(error, [ Sought.Error, Other.Error ], true))
+        }
+        okay(test, [ true ], 'catch nested')
+    }
     {
         const test = []
         try {
