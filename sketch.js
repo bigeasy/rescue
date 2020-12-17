@@ -187,3 +187,22 @@ function recoverable () {
         }
     }
 }
+
+function recoverable () {
+    try {
+    } catch (error) {
+        const rescued = rescue({
+            io: [ Error, { code: /^E/ } ],
+            syntax: [ Destructible.Error, 0, 0, [ [ SyntaxError ], [{ code: 'ENOENT' }] ] ]
+        })(error, { partial: true })
+        switch (rescued.code) {
+        case 'syntax':
+            rescued.rescue([ Destructible.Error, Error, { code: 'ENOENT' } ])
+            rescued.complete
+            return 'rescued a syntax error'
+        default:
+            rescued.complete
+            return null
+        }
+    }
+}
