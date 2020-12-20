@@ -19,4 +19,4 @@ Conditionally catch a JavaScript exception based on type and properties,
 npm install rescue
 ```
 
-[Current documentation](https://bigeasy.github.io/rescue/docco/readme.t.hml).
+[Current documentation](https://bigeasy.github.io/rescue/docco/readme.t.js.html).
