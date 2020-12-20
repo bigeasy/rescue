@@ -25,6 +25,11 @@
                 </a>
 
 
+                <a class="source" href="error.js.html">
+                  error.js
+                </a>
+
+
                 <a class="source" href="find.js.html">
                   find.js
                 </a>
@@ -40,18 +45,8 @@
                 </a>
 
 
-                <a class="source" href="redux.js.html">
-                  redux.js
-                </a>
-
-
                 <a class="source" href="rescue.js.html">
                   rescue.js
-                </a>
-
-
-                <a class="source" href="rescue.t.js.html">
-                  rescue.t.js
                 </a>
 
 
@@ -90,6 +85,13 @@
 
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">const</span> subordinate = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;subordinate&#x27;</span>)
 
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">sortof</span> (<span class="hljs-params">value</span>) </span>{
+    <span class="hljs-keyword">if</span> (value == <span class="hljs-literal">null</span>) {
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.prototype.toString.call(value).slice(<span class="hljs-number">8</span>, -<span class="hljs-number">1</span>).toLowerCase()
+}
+
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">condition</span> (<span class="hljs-params">test</span>) </span>{
     <span class="hljs-keyword">const</span> conditions = []
     <span class="hljs-keyword">switch</span> (test.type) {
@@ -107,6 +109,13 @@
     <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;number&#x27;</span>:
     <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;string&#x27;</span>: {
             conditions.push(<span class="hljs-function"><span class="hljs-params">value</span> =&gt;</span> <span class="hljs-keyword">typeof</span> value == test.type)
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> pattern <span class="hljs-keyword">of</span> test.patterns) {
+                conditions.push(<span class="hljs-function"><span class="hljs-params">value</span> =&gt;</span> subordinate(value, pattern))
+            }
+            <span class="hljs-keyword">return</span> conditions
+        }
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;symbol&#x27;</span>: {
+            conditions.push(<span class="hljs-function"><span class="hljs-params">value</span> =&gt;</span> sortof(value) == test.type)
             <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> pattern <span class="hljs-keyword">of</span> test.patterns) {
                 conditions.push(<span class="hljs-function"><span class="hljs-params">value</span> =&gt;</span> subordinate(value, pattern))
             }

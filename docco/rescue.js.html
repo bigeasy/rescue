@@ -25,6 +25,11 @@
                 </a>
 
 
+                <a class="source" href="error.js.html">
+                  error.js
+                </a>
+
+
                 <a class="source" href="find.js.html">
                   find.js
                 </a>
@@ -40,18 +45,8 @@
                 </a>
 
 
-                <a class="source" href="redux.js.html">
-                  redux.js
-                </a>
-
-
                 <a class="source" href="rescue.js.html">
                   rescue.js
-                </a>
-
-
-                <a class="source" href="rescue.t.js.html">
-                  rescue.t.js
                 </a>
 
 
@@ -85,285 +80,138 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
+              <p>Couple of todos.</p>
 
             </div>
 
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">const</span> assert = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;assert&#x27;</span>)
-<span class="hljs-keyword">const</span> Selector = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./selector&#x27;</span>)
+        </li>
 
-<span class="hljs-keyword">const</span> primitives = {
-    <span class="hljs-attr">types</span>: [ <span class="hljs-built_in">Boolean</span>, <span class="hljs-built_in">Number</span>, <span class="hljs-built_in">String</span>, BigInt, <span class="hljs-built_in">Array</span> ],
-    <span class="hljs-attr">conditions</span>: [
-        <span class="hljs-function">(<span class="hljs-params">when</span>) =&gt;</span> {
-            <span class="hljs-keyword">const</span> conditions = [ <span class="hljs-function">(<span class="hljs-params">b</span>) =&gt;</span> <span class="hljs-keyword">typeof</span> b == <span class="hljs-string">&#x27;boolean&#x27;</span> ]
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> when[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;boolean&#x27;</span>) {
-                <span class="hljs-keyword">const</span> value = when.shift()
-                conditions.push(<span class="hljs-function">(<span class="hljs-params">b</span>) =&gt;</span> !! b == value)
+
+        <li id="section-2">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p><strong>TODO</strong> We can do a partial match with <code>[ [ ~1 ], &#39;thrown&#39; ]</code></p>
+
+            </div>
+
+        </li>
+
+
+        <li id="section-3">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p><strong>TODO</strong> We want to be able to handle circular references without blowing the
+stack, but they are still tricky. They will be difficult to document. They
+will be exceedingly rare, so it’s not really our problem.</p>
+
+            </div>
+
+        </li>
+
+
+        <li id="section-4">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p><strong>TODO</strong> We want to nest the thrown exception in a <code>Rescue.Error</code> if there
+are errors in the pattern. If we are currying we throw exceptions
+immediately.</p>
+
+            </div>
+
+        </li>
+
+
+        <li id="section-5">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p><strong>TODO</strong> Do we <code>Rescue.rescue</code>? Yeah, probably. Then we have <code>Rescue.Error</code>
+and we can play around with the <code>Rescue</code> object.</p>
+
+            </div>
+
+        </li>
+
+
+        <li id="section-6">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p><strong>TODO</strong> Really need to clean up the parser for each type. Moved toward
+creating a common parser object.</p>
+
+            </div>
+
+        </li>
+
+
+        <li id="section-7">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p><strong>TODO</strong> Document subordinate and point the user over there.</p>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Rescue</span> </span>{
+    <span class="hljs-title">constructor</span> (<span class="hljs-params">code, errors</span>) {
+        <span class="hljs-built_in">this</span>.code = code
+        <span class="hljs-built_in">this</span>.errors = errors
+    }
+}
+
+<span class="hljs-keyword">const</span> Tree = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./tree&#x27;</span>)
+<span class="hljs-keyword">const</span> Parse = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./parse&#x27;</span>)
+<span class="hljs-keyword">const</span> Compile = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./compile&#x27;</span>)
+<span class="hljs-keyword">const</span> Find = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./find&#x27;</span>)
+
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">rescue</span> (<span class="hljs-params">error, pattern</span>) </span>{
+    <span class="hljs-keyword">const</span> patterns = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Array</span>.isArray(pattern)) {
+            <span class="hljs-keyword">return</span> { <span class="hljs-attr">rescue</span>: Compile(Parse(pattern)) }
+        }
+        <span class="hljs-keyword">const</span> parsed = {}
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> code <span class="hljs-keyword">in</span> pattern) {
+            parsed[code] = Compile(Parse(pattern[code]))
+        }
+        <span class="hljs-keyword">return</span> parsed
+    } ()
+
+    <span class="hljs-keyword">const</span> f = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error</span>) </span>{
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> code <span class="hljs-keyword">in</span> patterns) {
+            <span class="hljs-keyword">const</span> compiled = patterns[code]
+            <span class="hljs-keyword">const</span> tree = Tree(error)
+            <span class="hljs-keyword">const</span> found = Find(compiled.match, compiled.dive, compiled.test, tree)
+            <span class="hljs-keyword">if</span> (found != <span class="hljs-literal">null</span>) {
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Rescue(code, found.map(<span class="hljs-function"><span class="hljs-params">id</span> =&gt;</span> tree.ordered[tree.nodes[id].index]))
             }
-            conditions.push.apply(conditions, _functions(when))
-            assert(when.length == <span class="hljs-number">0</span>)
-            <span class="hljs-keyword">return</span> conditions
-        },
-        <span class="hljs-function">(<span class="hljs-params">when</span>) =&gt;</span> {
-            <span class="hljs-keyword">const</span> conditions = [ <span class="hljs-function">(<span class="hljs-params">n</span>) =&gt;</span> <span class="hljs-keyword">typeof</span> n == <span class="hljs-string">&#x27;number&#x27;</span> ]
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> when[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;number&#x27;</span>) {
-                <span class="hljs-keyword">const</span> value = when.shift()
-                conditions.push(<span class="hljs-function">(<span class="hljs-params">n</span>) =&gt;</span> n == value)
-            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (
-                <span class="hljs-built_in">Array</span>.isArray(when[<span class="hljs-number">0</span>]) &amp;&amp;
-                when[<span class="hljs-number">0</span>].map(<span class="hljs-function">(<span class="hljs-params">n</span>) =&gt;</span> <span class="hljs-keyword">typeof</span> n == <span class="hljs-string">&#x27;number&#x27;</span>).length == <span class="hljs-number">2</span>
-            ) {
-                <span class="hljs-keyword">const</span> range = when.shift()
-                conditions.push(<span class="hljs-function">(<span class="hljs-params">n</span>) =&gt;</span> range[<span class="hljs-number">0</span>] &lt;= n &amp;&amp; n &lt;= range[<span class="hljs-number">1</span>])
-            }
-            conditions.push.apply(conditions, _functions(when))
-            assert(when.length == <span class="hljs-number">0</span>)
-            <span class="hljs-keyword">return</span> conditions
-        },
-        <span class="hljs-function">(<span class="hljs-params">when</span>) =&gt;</span> {
-            <span class="hljs-keyword">const</span> conditions = [ <span class="hljs-function">(<span class="hljs-params">s</span>) =&gt;</span> <span class="hljs-keyword">typeof</span> s == <span class="hljs-string">&#x27;string&#x27;</span> ]
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> when[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;string&#x27;</span>) {
-                <span class="hljs-keyword">const</span> value = when.shift()
-                conditions.push(<span class="hljs-function">(<span class="hljs-params">s</span>) =&gt;</span> s.toString() == value)
-            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (when[<span class="hljs-number">0</span>] <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">RegExp</span>) {
-                <span class="hljs-keyword">const</span> regex = when.shift()
-                conditions.push(<span class="hljs-function">(<span class="hljs-params">s</span>) =&gt;</span> regex.test(s.toString()))
-                assert(when.length == <span class="hljs-number">0</span>)
-            }
-            conditions.push.apply(conditions, _functions(when))
-            assert(when.length == <span class="hljs-number">0</span>)
-            <span class="hljs-keyword">return</span> conditions
-        },
-        <span class="hljs-function">(<span class="hljs-params">when</span>) =&gt;</span> {
-            <span class="hljs-keyword">const</span> conditions =  [ <span class="hljs-function">(<span class="hljs-params">n</span>) =&gt;</span> <span class="hljs-keyword">typeof</span> n == <span class="hljs-string">&#x27;bigint&#x27;</span> ]
-            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> when[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;bigint&#x27;</span>) {
-                <span class="hljs-keyword">const</span> value = when.shift()
-                conditions.push(<span class="hljs-function">(<span class="hljs-params">n</span>) =&gt;</span> n == value)
-            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (
-                <span class="hljs-built_in">Array</span>.isArray(when[<span class="hljs-number">0</span>]) &amp;&amp;
-                when[<span class="hljs-number">0</span>].map(<span class="hljs-function">(<span class="hljs-params">n</span>) =&gt;</span> <span class="hljs-keyword">typeof</span> n == <span class="hljs-string">&#x27;bigint&#x27;</span>).length == <span class="hljs-number">2</span>
-            ) {
-                <span class="hljs-keyword">const</span> range = when.shift()
-                conditions.push(<span class="hljs-function">(<span class="hljs-params">n</span>) =&gt;</span> range[<span class="hljs-number">0</span>] &lt;= n &amp;&amp; n &lt;= range[<span class="hljs-number">1</span>])
-            }
-            conditions.push.apply(conditions, _functions(when))
-            assert(when.length == <span class="hljs-number">0</span>)
-            <span class="hljs-keyword">return</span> conditions
-        },
-        <span class="hljs-function">(<span class="hljs-params">when</span>) =&gt;</span> {
-            <span class="hljs-keyword">const</span> conditions =  [ <span class="hljs-function">(<span class="hljs-params">a</span>) =&gt;</span> <span class="hljs-built_in">Array</span>.isArray(a) ]
-            <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Array</span>.isArray(when[<span class="hljs-number">0</span>])) {
-                <span class="hljs-keyword">const</span> value = when.shift()
-                conditions.push(<span class="hljs-function">(<span class="hljs-params">a</span>) =&gt;</span>  a.filter(<span class="hljs-function">(<span class="hljs-params">v, i</span>) =&gt;</span> value[i] == v).length == value.length)
-            }
-            conditions.push.apply(conditions, _functions(when))
-            assert(when.length == <span class="hljs-number">0</span>)
-            <span class="hljs-keyword">return</span> conditions
         }
-    ]
+        <span class="hljs-keyword">throw</span> error
+    }
+    <span class="hljs-keyword">if</span> (error === rescue) {
+        <span class="hljs-keyword">return</span> f
+    }
+    <span class="hljs-keyword">return</span> f(error)
 }
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_dive</span> (<span class="hljs-params">when</span>) </span>{
-    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> when[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;number&#x27;</span>) {
-        <span class="hljs-keyword">const</span> dive = when.shift()
-        <span class="hljs-keyword">return</span> [ dive, dive ]
-    }
-    <span class="hljs-keyword">if</span> (
-        <span class="hljs-built_in">Array</span>.isArray(when[<span class="hljs-number">0</span>]) &amp;&amp;
-        when[<span class="hljs-number">0</span>].filter(<span class="hljs-function">(<span class="hljs-params">n</span>) =&gt;</span> <span class="hljs-keyword">typeof</span> n == <span class="hljs-string">&#x27;number&#x27;</span>).length == <span class="hljs-number">2</span>
-    ) {
-        <span class="hljs-keyword">return</span> when.shift()
-    }
-    <span class="hljs-keyword">return</span> [ <span class="hljs-number">0</span>, <span class="hljs-literal">Infinity</span> ]
-}
-
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_type</span> (<span class="hljs-params">when</span>) </span>{
-    <span class="hljs-keyword">if</span> (
-        <span class="hljs-keyword">typeof</span> when[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;function&#x27;</span> &amp;&amp;
-        when[<span class="hljs-number">0</span>].prototype != <span class="hljs-literal">null</span> &amp;&amp;
-        <span class="hljs-keyword">typeof</span> when[<span class="hljs-number">0</span>].prototype == <span class="hljs-string">&#x27;object&#x27;</span>
-    ) {
-        <span class="hljs-keyword">return</span> when.shift()
-    }
-    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Error</span>
-}
-
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_string</span> (<span class="hljs-params">when, type</span>) </span>{
-    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> when[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;string&#x27;</span>) {
-        <span class="hljs-keyword">const</span> string = when.shift()
-        <span class="hljs-keyword">if</span> (type.prototype <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">Error</span> || type === <span class="hljs-built_in">Error</span>) {
-            <span class="hljs-keyword">return</span> [ <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> e.message == string ]
-        }
-        <span class="hljs-keyword">return</span> [ <span class="hljs-function">(<span class="hljs-params">o</span>) =&gt;</span> o.toString() == string ]
-    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (when[<span class="hljs-number">0</span>] <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">RegExp</span>) {
-        <span class="hljs-keyword">const</span> regex = when.shift()
-        <span class="hljs-keyword">if</span> (type.prototype <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">Error</span> || type === <span class="hljs-built_in">Error</span>) {
-            <span class="hljs-keyword">return</span> [ <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> regex.test(e.message) ]
-        }
-        <span class="hljs-keyword">return</span> [ <span class="hljs-function">(<span class="hljs-params">o</span>) =&gt;</span> regex.test(o.toString()) ]
-    }
-    <span class="hljs-keyword">return</span> []
-}
-
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_properties</span> (<span class="hljs-params">when</span>) </span>{
-    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> when[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;object&#x27;</span> &amp;&amp; !<span class="hljs-built_in">Array</span>.isArray(when[<span class="hljs-number">0</span>])) {
-        <span class="hljs-keyword">const</span> properties = when.shift()
-        <span class="hljs-keyword">return</span> [ <span class="hljs-function">(<span class="hljs-params">o</span>) =&gt;</span> {
-            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> property <span class="hljs-keyword">in</span> properties) {
-                <span class="hljs-keyword">if</span> (properties[property] <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">RegExp</span>) {
-                    <span class="hljs-keyword">if</span> (!properties[property].test(o[property])) {
-                        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
-                    }
-                } <span class="hljs-keyword">else</span> {
-                    <span class="hljs-keyword">if</span> (properties[property] != o[property]) {
-                        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
-                    }
-                }
-            }
-            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
-        } ]
-    }
-    <span class="hljs-keyword">return</span> []
-}
-
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_functions</span> (<span class="hljs-params">when</span>) </span>{
-    <span class="hljs-keyword">const</span> functions = []
-    <span class="hljs-keyword">for</span> (;;) {
-        <span class="hljs-keyword">if</span> (
-            <span class="hljs-keyword">typeof</span> when[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;function&#x27;</span> &amp;&amp;
-            (
-                when[<span class="hljs-number">0</span>].prototype == <span class="hljs-literal">null</span> ||
-                <span class="hljs-keyword">typeof</span> when[<span class="hljs-number">0</span>].prototype != <span class="hljs-string">&#x27;object&#x27;</span>
-            )
-        ) {
-            functions.push(when.shift())
-        } <span class="hljs-keyword">else</span> {
-            <span class="hljs-keyword">return</span> functions
-        }
-    }
-}
-
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_boolean</span> (<span class="hljs-params">when</span>) </span>{
-    <span class="hljs-keyword">const</span> booleans = []
-    <span class="hljs-keyword">for</span> (;;) {
-        <span class="hljs-keyword">if</span> (
-            <span class="hljs-keyword">typeof</span> when[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;boolean&#x27;</span>
-        ) {
-            <span class="hljs-keyword">const</span> value = when.shift()
-            booleans.push(<span class="hljs-function">() =&gt;</span> value)
-        } <span class="hljs-keyword">else</span> {
-            <span class="hljs-keyword">return</span> booleans
-        }
-    }
-}
-
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_callback</span> (<span class="hljs-params">vargs</span>) </span>{
-    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> vargs[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;function&#x27;</span>) {
-        <span class="hljs-keyword">return</span> vargs.shift()
-    }
-    <span class="hljs-keyword">if</span> (vargs.length != <span class="hljs-number">0</span> &amp;&amp; !<span class="hljs-built_in">Array</span>.isArray(vargs[<span class="hljs-number">0</span>])) {
-        <span class="hljs-keyword">const</span> result = vargs.shift()
-        <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> result
-    }
-    <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> {}
-}
-
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">check</span> (<span class="hljs-params">error, vargs</span>) </span>{
-    <span class="hljs-keyword">const</span> cases = []
-    <span class="hljs-keyword">if</span> (vargs.length == <span class="hljs-number">1</span>) {
-        <span class="hljs-keyword">if</span> (
-            <span class="hljs-built_in">Array</span>.isArray(vargs[<span class="hljs-number">0</span>]) &amp;&amp;
-            <span class="hljs-built_in">Array</span>.isArray(vargs[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]) &amp;&amp;
-            (
-                vargs[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>].length != <span class="hljs-number">2</span>
-                ||
-                vargs[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>].filter(<span class="hljs-function">(<span class="hljs-params">n</span>) =&gt;</span> <span class="hljs-keyword">typeof</span> n == <span class="hljs-string">&#x27;number&#x27;</span>).length != <span class="hljs-number">2</span>
-            )
-        ) {
-            vargs = vargs[<span class="hljs-number">0</span>]
-        }
-    }
-    <span class="hljs-keyword">while</span> (vargs.length) {
-        <span class="hljs-keyword">const</span> parts = [{ <span class="hljs-attr">dive</span>: [ <span class="hljs-number">0</span>, <span class="hljs-literal">Infinity</span> ] }]
-        <span class="hljs-keyword">const</span> when = vargs.shift()
-        <span class="hljs-keyword">const</span> only = vargs.length != <span class="hljs-number">0</span> &amp;&amp; <span class="hljs-built_in">Array</span>.isArray(vargs[<span class="hljs-number">0</span>]) &amp;&amp; vargs[<span class="hljs-number">0</span>].length == <span class="hljs-number">0</span>
-            ? ! vargs.shift()
-            : <span class="hljs-literal">true</span>
-        <span class="hljs-keyword">while</span> (when.length) {
-            <span class="hljs-keyword">const</span> conditions = []
-            parts[parts.length - <span class="hljs-number">1</span>].dive = _dive(when)
-            <span class="hljs-keyword">const</span> type = _type(when)
-            <span class="hljs-keyword">const</span> index = primitives.types.indexOf(type)
-            <span class="hljs-keyword">if</span> (~index) {
-                conditions.push.apply(conditions, primitives.conditions[index](when))
-            } <span class="hljs-keyword">else</span> {
-                conditions.push(<span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> e <span class="hljs-keyword">instanceof</span> type)
-                conditions.push.apply(conditions, _string(when, type))
-                conditions.push.apply(conditions, _properties(when))
-                conditions.push.apply(conditions, _functions(when))
-                conditions.push.apply(conditions, _boolean(when))
-            }
-            parts.push({ <span class="hljs-attr">dive</span>: [ <span class="hljs-number">0</span>, <span class="hljs-number">1</span> ], <span class="hljs-attr">conditions</span>: conditions })
-        }
-        <span class="hljs-keyword">const</span> callback = _callback(vargs)
-        <span class="hljs-keyword">const</span> path = []
-        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">1</span>, I = parts.length; i &lt; I; i++) {
-            <span class="hljs-keyword">const</span> { dive, conditions } = parts[i]
-            path.push(<span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> {
-                <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> condition <span class="hljs-keyword">of</span> conditions) {
-                    <span class="hljs-keyword">if</span> (!condition(e)) {
-                        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>
-                    }
-                }
-                <span class="hljs-keyword">return</span> dive
-            })
-        }
-        <span class="hljs-keyword">const</span> dive = parts[<span class="hljs-number">0</span>].dive
-        cases.push({
-            <span class="hljs-attr">test</span>: <span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
-                <span class="hljs-keyword">const</span> selector = <span class="hljs-keyword">new</span> Selector(error)
-                <span class="hljs-keyword">const</span> errors = []
-                <span class="hljs-keyword">const</span> found = selector.prune(path, dive)
-                <span class="hljs-keyword">if</span> (found.length != <span class="hljs-number">0</span>) {
-                    <span class="hljs-keyword">if</span> (only) {
-                       <span class="hljs-keyword">return</span> found.length == <span class="hljs-number">1</span> ? found.shift() : <span class="hljs-literal">null</span>
-                    }
-                    <span class="hljs-keyword">return</span> found
-                }
-                <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>
-            },
-            <span class="hljs-attr">callback</span>: callback
-        })
-    }
-    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>, I = cases.length; i &lt; I; i++) {
-        <span class="hljs-keyword">const</span> found = cases[i].test(error)
-        <span class="hljs-keyword">if</span> (found != <span class="hljs-literal">null</span>) {
-            <span class="hljs-keyword">return</span> cases[i].callback(found)
-        }
-    }
-    <span class="hljs-keyword">throw</span> error
-}
-
-<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, ...vargs</span>) </span>{
-    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> error == <span class="hljs-string">&#x27;function&#x27;</span>) {
-        <span class="hljs-keyword">try</span> {
-            error = error()
-            <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Promise</span>.resolve(error) === error) {
-                <span class="hljs-keyword">return</span> <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-                    <span class="hljs-keyword">try</span> {
-                        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> error
-                    } <span class="hljs-keyword">catch</span> (error) {
-                        <span class="hljs-keyword">return</span> check(error, vargs)
-                    }
-                } ()
-            }
-            <span class="hljs-keyword">return</span> error
-        } <span class="hljs-keyword">catch</span> (error) {
-            <span class="hljs-keyword">return</span> check(error, vargs)
-        }
-    }
-    <span class="hljs-keyword">return</span> check(error, vargs)
-}</pre></div></div>
+<span class="hljs-built_in">module</span>.exports = rescue</pre></div></div>
 
         </li>
 

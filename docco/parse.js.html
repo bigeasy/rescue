@@ -25,6 +25,11 @@
                 </a>
 
 
+                <a class="source" href="error.js.html">
+                  error.js
+                </a>
+
+
                 <a class="source" href="find.js.html">
                   find.js
                 </a>
@@ -40,18 +45,8 @@
                 </a>
 
 
-                <a class="source" href="redux.js.html">
-                  redux.js
-                </a>
-
-
                 <a class="source" href="rescue.js.html">
                   rescue.js
-                </a>
-
-
-                <a class="source" href="rescue.t.js.html">
-                  rescue.t.js
                 </a>
 
 
@@ -90,25 +85,101 @@
 
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">const</span> assert = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;assert&#x27;</span>)
 
-<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">pattern, { display = <span class="hljs-literal">false</span> } = {}</span>) </span>{
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">qualify</span> (<span class="hljs-params">value</span>) </span>{
+<span class="hljs-keyword">const</span> Rescue = { <span class="hljs-attr">Error</span>: <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./error&#x27;</span>) }
+
+
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">pattern, { display = <span class="hljs-literal">false</span> } = {}</span>) </span>{</pre></div></div>
+
+        </li>
+
+
+        <li id="section-2">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>For all the basic types, primitive and native objects…</p>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures">JavaScript data types and data
+structures</a>.</li>
+</ul>
+
+            </div>
+
+        </li>
+
+
+        <li id="section-3">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">const</span> BASICS = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Set</span>([ <span class="hljs-built_in">Error</span>, <span class="hljs-built_in">Number</span>, <span class="hljs-built_in">String</span>, <span class="hljs-built_in">Boolean</span>, <span class="hljs-built_in">Symbol</span>, BigInt ])</pre></div></div>
+
+        </li>
+
+
+        <li id="section-4">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+
+            </div>
+
+        </li>
+
+
+        <li id="section-5">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>News to me after all these years…</p>
+<ul>
+<li><a href="https://stackoverflow.com/a/17583612">what is the best way to check variable type in javascript - Michael
+Mikowski</a></li>
+<li><a href="https://stackoverflow.com/a/14206536">Check whether variable is number or string in JavaScript - Michael
+Mikowski</a></li>
+<li>[Standard ECMA-262 5.1 Edition - <code>Object.prototype.toString()</code>]
+<a href="https://www.ecma-international.org/ecma-262/5.1/#sec-15.2.4.2">https://www.ecma-international.org/ecma-262/5.1/#sec-15.2.4.2</a></li>
+</ul>
+<p>I never create strings or numbers with a constructor, so I’ve never
+encoutered this as a problem.</p>
+
+            </div>
+
+        </li>
+
+
+        <li id="section-6">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">qualify</span> (<span class="hljs-params">value</span>) </span>{
         assert(value != <span class="hljs-literal">null</span>)
-        <span class="hljs-keyword">if</span> (value.prototype <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">Error</span> || value === <span class="hljs-built_in">Error</span>) {
-            <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;error&#x27;</span>
+        <span class="hljs-keyword">if</span> (BASICS.has(value)) {
+            <span class="hljs-keyword">return</span> value.name
         }
-        <span class="hljs-keyword">if</span> (value === <span class="hljs-built_in">String</span>) {
-            <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;String&#x27;</span>
-        }
-        <span class="hljs-keyword">if</span> (value === <span class="hljs-built_in">Number</span>) {
-            <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;Number&#x27;</span>
-        }
-        <span class="hljs-keyword">if</span> (value === <span class="hljs-built_in">Boolean</span>) {
-            <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;Boolean&#x27;</span>
+        <span class="hljs-keyword">if</span> (value.prototype <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">Error</span>) {
+            <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;Error&#x27;</span>
         }
         <span class="hljs-keyword">if</span> (value <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">RegExp</span>) {
             <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;regex&#x27;</span>
         }
-        <span class="hljs-keyword">const</span> type = <span class="hljs-keyword">typeof</span> value
+        <span class="hljs-keyword">const</span> type = <span class="hljs-built_in">Object</span>.prototype.toString.call(value).slice(<span class="hljs-number">8</span>, -<span class="hljs-number">1</span>).toLowerCase()
         <span class="hljs-keyword">switch</span> (type) {
         <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;number&#x27;</span>:
             <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Number</span>.isInteger(value) &amp;&amp; value &gt;= <span class="hljs-number">0</span>) {
@@ -116,17 +187,17 @@
             }
             <span class="hljs-keyword">return</span> type
         <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;string&#x27;</span>:
+        <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;symbol&#x27;</span>:
         <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;object&#x27;</span>:
-            <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Array</span>.isArray(value)) {
-                <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;array&#x27;</span>
-            }
+        <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;array&#x27;</span>:
             <span class="hljs-keyword">return</span> type
         }
     }
 
-    <span class="hljs-keyword">const</span> descend = [ <span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-string">&#x27;array&#x27;</span>, <span class="hljs-string">&#x27;Number&#x27;</span>, <span class="hljs-string">&#x27;Boolean&#x27;</span>, <span class="hljs-string">&#x27;String&#x27;</span> ]
+    <span class="hljs-keyword">const</span> descend = [ <span class="hljs-string">&#x27;Symbol&#x27;</span>, <span class="hljs-string">&#x27;Error&#x27;</span>, <span class="hljs-string">&#x27;array&#x27;</span>, <span class="hljs-string">&#x27;Number&#x27;</span>, <span class="hljs-string">&#x27;Boolean&#x27;</span>, <span class="hljs-string">&#x27;String&#x27;</span> ]
     <span class="hljs-keyword">const</span> expected = {
         <span class="hljs-attr">error</span>: [ <span class="hljs-string">&#x27;range&#x27;</span>, <span class="hljs-string">&#x27;object&#x27;</span>, <span class="hljs-string">&#x27;string&#x27;</span>, <span class="hljs-string">&#x27;regex&#x27;</span> ],
+        <span class="hljs-attr">symbol</span>: [ <span class="hljs-string">&#x27;range&#x27;</span>, <span class="hljs-string">&#x27;symbol&#x27;</span> ],
         <span class="hljs-attr">array</span>: [ <span class="hljs-string">&#x27;array&#x27;</span> ],
         <span class="hljs-attr">number</span>: [ <span class="hljs-string">&#x27;number&#x27;</span>, <span class="hljs-string">&#x27;range&#x27;</span> ],
         <span class="hljs-attr">bool</span>: [ <span class="hljs-string">&#x27;bool&#x27;</span> ],
@@ -151,8 +222,69 @@
         }
     }
 
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Parser</span> </span>{
+        <span class="hljs-keyword">static</span> newable = <span class="hljs-literal">true</span>
+
+        <span class="hljs-title">constructor</span> (<span class="hljs-params">mode, type, accepted</span>) {
+            <span class="hljs-built_in">this</span>.ranges = []
+            <span class="hljs-built_in">this</span>.mode = mode
+            <span class="hljs-built_in">this</span>.type = type
+            <span class="hljs-built_in">this</span>.patterns = []
+            <span class="hljs-built_in">this</span>.errors = []
+            <span class="hljs-built_in">this</span>.accepted = accepted
+        }
+
+        consume (type, value) {
+            <span class="hljs-keyword">if</span> (~<span class="hljs-built_in">this</span>.accepted.indexOf(type)) {
+                <span class="hljs-keyword">switch</span> (type) {
+                <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;range&#x27;</span>: {
+                        <span class="hljs-built_in">this</span>.ranges.push(value)
+                    }
+                    <span class="hljs-keyword">break</span>
+                <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;string&#x27;</span>:
+                <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;regex&#x27;</span>: {
+                        <span class="hljs-built_in">this</span>.patterns.push({ <span class="hljs-attr">message</span>: display ? value.toString() : value })
+                    }
+                    <span class="hljs-keyword">break</span>
+                <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;symbol&#x27;</span>: {
+                        <span class="hljs-built_in">this</span>.patterns.push(display ? value.toString() : value)
+                    }
+                    <span class="hljs-keyword">break</span>
+                <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;object&#x27;</span>: {
+                        <span class="hljs-built_in">this</span>.patterns.push(value)
+                    }
+                    <span class="hljs-keyword">break</span>
+                }
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-built_in">this</span>.errors.push(<span class="hljs-keyword">new</span> Rescue.Error(<span class="hljs-string">&#x27;UNEXPECTED_CONDITION_TYPE&#x27;</span>, <span class="hljs-number">0</span>, { <span class="hljs-attr">mode</span>: <span class="hljs-built_in">this</span>.mode, type }))
+            }
+        }
+
+        done (next = <span class="hljs-literal">null</span>) {
+            <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.ranges.length &gt; <span class="hljs-number">2</span>) {
+                <span class="hljs-built_in">this</span>.errors.push(<span class="hljs-keyword">new</span> Rescue.Error(<span class="hljs-string">&#x27;TOO_MANY_RANGES&#x27;</span>, <span class="hljs-number">0</span>, { ranges }))
+            }
+            <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.ranges.length == <span class="hljs-number">2</span> &amp;&amp; <span class="hljs-built_in">this</span>.ranges[<span class="hljs-number">0</span>] &gt; <span class="hljs-built_in">this</span>.ranges[<span class="hljs-number">1</span>]) {
+                <span class="hljs-built_in">this</span>.errors.push(<span class="hljs-keyword">new</span> Rescue.Error(<span class="hljs-string">&#x27;RANGES_OUT_OF_ORDER&#x27;</span>, <span class="hljs-number">0</span>, { ranges }))
+            }
+            <span class="hljs-keyword">const</span> dive = <span class="hljs-built_in">this</span>.ranges.length == <span class="hljs-number">2</span>
+                ? <span class="hljs-built_in">this</span>.ranges
+                : <span class="hljs-built_in">this</span>.ranges.length == <span class="hljs-number">1</span>
+                    ? [ <span class="hljs-number">0</span>, <span class="hljs-built_in">this</span>.ranges[<span class="hljs-number">0</span>] ]
+                    : [ <span class="hljs-number">0</span>, <span class="hljs-built_in">Number</span>.MAX_SAFE_INTEGER ]
+            <span class="hljs-keyword">return</span> {
+                <span class="hljs-attr">dive</span>: dive,
+                <span class="hljs-attr">test</span>: {
+                    <span class="hljs-attr">patterns</span>: <span class="hljs-built_in">this</span>.patterns,
+                    <span class="hljs-attr">type</span>: <span class="hljs-built_in">this</span>.type
+                },
+                next
+            }
+        }
+    }
+
     <span class="hljs-keyword">const</span> parsers = {
-        <span class="hljs-attr">array</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">object, type, value</span>) </span>{
+        <span class="hljs-attr">array</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">object, value</span>) </span>{
             <span class="hljs-keyword">const</span> forks = []
             <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> branch <span class="hljs-keyword">of</span> value) {
                 assert(<span class="hljs-built_in">Array</span>.isArray(branch))
@@ -164,8 +296,8 @@
                 }
             }
         },
-        <span class="hljs-attr">error</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">object, type, value</span>) </span>{
-            object.test = { type, <span class="hljs-attr">patterns</span>: [], <span class="hljs-attr">error</span>: display ? value.prototype.name : value }
+        <span class="hljs-attr">error</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">object, value</span>) </span>{
+            object.test = { ...object.test, <span class="hljs-attr">patterns</span>: [], <span class="hljs-attr">error</span>: display ? value.prototype.name : value }
             <span class="hljs-keyword">return</span> {
                 <span class="hljs-attr">range</span>: <span class="hljs-string">&#x27;max&#x27;</span>,
                 <span class="hljs-attr">mode</span>: <span class="hljs-string">&#x27;error&#x27;</span>,
@@ -191,8 +323,8 @@
                 }
             }
         },
-        <span class="hljs-attr">String</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">object, type, value</span>) </span>{
-            object.test = { <span class="hljs-attr">type</span>: type.toLowerCase(), <span class="hljs-attr">patterns</span>: [] }
+        <span class="hljs-attr">string</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">object, value</span>) </span>{
+            object.test = { ...object.test, <span class="hljs-attr">patterns</span>: [] }
             <span class="hljs-keyword">return</span> {
                 <span class="hljs-attr">range</span>: <span class="hljs-string">&#x27;max&#x27;</span>,
                 <span class="hljs-attr">mode</span>: <span class="hljs-string">&#x27;string&#x27;</span>,
@@ -217,8 +349,8 @@
                 }
             }
         },
-        <span class="hljs-attr">BigInt</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">object, type, value</span>) </span>{
-            object.test = { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;number&#x27;</span>, <span class="hljs-attr">patterns</span>: [] }
+        <span class="hljs-attr">bigint</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">object, value</span>) </span>{
+            object.test = { ...object.test, <span class="hljs-attr">patterns</span>: [] }
             <span class="hljs-keyword">return</span> {
                 <span class="hljs-attr">range</span>: <span class="hljs-string">&#x27;max&#x27;</span>,
                 <span class="hljs-attr">mode</span>: <span class="hljs-string">&#x27;boolean&#x27;</span>,
@@ -239,8 +371,13 @@
                 }
             }
         },
-        <span class="hljs-attr">Boolean</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">object, type, value</span>) </span>{
-            object.test = { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;boolean&#x27;</span>, <span class="hljs-attr">patterns</span>: [] }
+        <span class="hljs-attr">symbol</span>: <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Parser</span> </span>{
+            <span class="hljs-title">constructor</span> (<span class="hljs-params"></span>) {
+                <span class="hljs-built_in">super</span>(<span class="hljs-string">&#x27;symbol&#x27;</span>, <span class="hljs-string">&#x27;symbol&#x27;</span>, [ <span class="hljs-string">&#x27;range&#x27;</span>, <span class="hljs-string">&#x27;symbol&#x27;</span> ])
+            }
+        },
+        <span class="hljs-attr">boolean</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">object, value</span>) </span>{
+            object.test = { ...object.test, <span class="hljs-attr">patterns</span>: [] }
             <span class="hljs-keyword">return</span> {
                 <span class="hljs-attr">range</span>: <span class="hljs-string">&#x27;max&#x27;</span>,
                 <span class="hljs-attr">mode</span>: <span class="hljs-string">&#x27;boolean&#x27;</span>,
@@ -261,8 +398,8 @@
                 }
             }
         },
-        <span class="hljs-attr">Number</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">object, type, value</span>) </span>{
-            object.test = { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;number&#x27;</span>, <span class="hljs-attr">patterns</span>: [] }
+        <span class="hljs-attr">number</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">object, value</span>) </span>{
+            object.test = { ...object.test, <span class="hljs-attr">patterns</span>: [] }
             <span class="hljs-keyword">let</span> _value = <span class="hljs-literal">null</span>, wasRange = <span class="hljs-literal">false</span>
             <span class="hljs-keyword">const</span> values = []
             <span class="hljs-keyword">return</span> {
@@ -297,7 +434,7 @@
     }
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createObject</span> (<span class="hljs-params">type</span>) </span>{
-        <span class="hljs-keyword">return</span> { <span class="hljs-attr">dive</span>: [ <span class="hljs-number">0</span>, <span class="hljs-built_in">Number</span>.MAX_SAFE_INTEGER ], <span class="hljs-attr">test</span>: { type }, <span class="hljs-attr">next</span>: <span class="hljs-literal">null</span> }
+        <span class="hljs-keyword">return</span> { <span class="hljs-attr">dive</span>: [ <span class="hljs-number">0</span>, <span class="hljs-built_in">Number</span>.MAX_SAFE_INTEGER ], <span class="hljs-attr">test</span>: { <span class="hljs-attr">type</span>: type.toLowerCase() }, <span class="hljs-attr">next</span>: <span class="hljs-literal">null</span> }
     }
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">parse</span> (<span class="hljs-params">pattern, parser</span>) </span>{
@@ -306,9 +443,28 @@
             <span class="hljs-keyword">const</span> value = shifted === <span class="hljs-literal">Infinity</span> ? <span class="hljs-built_in">Number</span>.MAX_SAFE_INTEGER : shifted
             <span class="hljs-keyword">const</span> type = qualify(value)
             <span class="hljs-keyword">if</span> (~descend.indexOf(type)) {
-                <span class="hljs-keyword">return</span> parser.done(parse(pattern, parsers[type](createObject(type), type, value)))
-            } <span class="hljs-keyword">else</span> {
-                assert(~expected[parser.mode].indexOf(type))
+                <span class="hljs-keyword">const</span> builder = parsers[type.toLowerCase()]
+                <span class="hljs-keyword">if</span> (builder.newable) {
+                    <span class="hljs-keyword">return</span> parser.done(parse(pattern, <span class="hljs-keyword">new</span> builder(value)))
+                } <span class="hljs-keyword">else</span> {
+                    <span class="hljs-keyword">return</span> parser.done(parse(pattern, builder(createObject(type), value)))
+                }
+            } <span class="hljs-keyword">else</span> {</pre></div></div>
+
+        </li>
+
+
+        <li id="section-7">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p><strong>TODO</strong> Outgoing check in consume.</p>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre>                assert(~expected[parser.mode].indexOf(type))
                 parser.consume(type, value)
             }
         }
@@ -318,11 +474,11 @@
         </li>
 
 
-        <li id="section-2">
+        <li id="section-8">
             <div class="annotation">
 
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-2">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>If we do not have a type specified as the first argument, we assume
 <code>Error</code> is the desired type.</p>
@@ -344,14 +500,14 @@
                 ...options,
                 <span class="hljs-attr">dive</span>: [ <span class="hljs-number">0</span>, <span class="hljs-number">0</span> ],
                 <span class="hljs-attr">test</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;root&#x27;</span> },
-                <span class="hljs-attr">next</span>: parse(pattern, parsers[type](createObject(type), type, pattern.shift()))
+                <span class="hljs-attr">next</span>: parse(pattern, parsers[type.toLowerCase()](createObject(type), pattern.shift()))
             }
         }
         <span class="hljs-keyword">return</span> {
             ...options,
             <span class="hljs-attr">dive</span>: [ <span class="hljs-number">0</span>, <span class="hljs-number">0</span> ],
             <span class="hljs-attr">test</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;root&#x27;</span> },
-            <span class="hljs-attr">next</span>: parse(pattern, parsers.error(createObject(<span class="hljs-string">&#x27;error&#x27;</span>), <span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-built_in">Error</span>))
+            <span class="hljs-attr">next</span>: parse(pattern, parsers.error(createObject(<span class="hljs-string">&#x27;Error&#x27;</span>), <span class="hljs-built_in">Error</span>))
         }
     }
 

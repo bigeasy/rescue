@@ -25,6 +25,11 @@
                 </a>
 
 
+                <a class="source" href="error.js.html">
+                  error.js
+                </a>
+
+
                 <a class="source" href="find.js.html">
                   find.js
                 </a>
@@ -40,18 +45,8 @@
                 </a>
 
 
-                <a class="source" href="redux.js.html">
-                  redux.js
-                </a>
-
-
                 <a class="source" href="rescue.js.html">
                   rescue.js
-                </a>
-
-
-                <a class="source" href="rescue.t.js.html">
-                  rescue.t.js
                 </a>
 
 
@@ -98,14 +93,14 @@
         <span class="hljs-keyword">const</span> node = {
             <span class="hljs-attr">id</span>: nodes.length,
             <span class="hljs-attr">index</span>: index,
-            <span class="hljs-attr">message</span>: e.message,
+            <span class="hljs-attr">message</span>: e <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">Error</span> ? e.message : e.toString(),
             <span class="hljs-attr">parent</span>: parent,
             <span class="hljs-attr">errors</span>: []
         }
         nodes.push(node)
-        <span class="hljs-keyword">const</span> errors = <span class="hljs-built_in">Array</span>.isArray(e.errors) ? e.errors : [ e.error ]
-        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>, I = errors.length; i &lt; I; i++) {
-            <span class="hljs-keyword">if</span> (errors[i] <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">Error</span>) {
+        <span class="hljs-keyword">if</span> (e <span class="hljs-keyword">instanceof</span> <span class="hljs-built_in">Error</span>) {
+            <span class="hljs-keyword">const</span> errors = <span class="hljs-built_in">Array</span>.isArray(e.errors) ? e.errors : []
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>, I = errors.length; i &lt; I; i++) {
                 node.errors.push(tree(errors[i], ordered, node.id))
             }
         }
