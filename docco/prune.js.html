@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>prune.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+
+
+                <a class="source" href="compile.js.html">
+                  compile.js
+                </a>
+
+
+                <a class="source" href="find.js.html">
+                  find.js
+                </a>
+
+
+                <a class="source" href="parse.js.html">
+                  parse.js
+                </a>
+
+
+                <a class="source" href="prune.js.html">
+                  prune.js
+                </a>
+
+
+                <a class="source" href="redux.js.html">
+                  redux.js
+                </a>
+
+
+                <a class="source" href="rescue.js.html">
+                  rescue.js
+                </a>
+
+
+                <a class="source" href="rescue.t.js.html">
+                  rescue.t.js
+                </a>
+
+
+                <a class="source" href="readme.t.js.html">
+                  readme.t.js
+                </a>
+
+
+                <a class="source" href="tree.js.html">
+                  tree.js
+                </a>
+
+            </div>
+          </div>
+        </li>
+      </ul>
+
+    <ul class="sections">
+
+          <li id="title">
+              <div class="annotation">
+                  <h1>prune.js</h1>
+              </div>
+          </li>
+
+
+
+        <li id="section-1">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre><span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">tree, found</span>) </span>{
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> id <span class="hljs-keyword">of</span> found) {
+        <span class="hljs-keyword">let</span> iterator = tree.nodes[id]
+        <span class="hljs-keyword">while</span> (iterator.parent != <span class="hljs-number">0</span> &amp;&amp; (iterator.id == id || iterator.errors.length == <span class="hljs-number">0</span>)) {
+            <span class="hljs-keyword">const</span> parent = tree.nodes[iterator.parent]
+            parent.errors.splice(parent.errors.indexOf(iterator), <span class="hljs-number">1</span>)
+            iterator = parent
+        }
+    }
+}</pre></div></div>
+
+        </li>
+
+    </ul>
+  </div>
+</body>
+</html>

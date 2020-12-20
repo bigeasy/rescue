@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>find.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+
+
+                <a class="source" href="compile.js.html">
+                  compile.js
+                </a>
+
+
+                <a class="source" href="find.js.html">
+                  find.js
+                </a>
+
+
+                <a class="source" href="parse.js.html">
+                  parse.js
+                </a>
+
+
+                <a class="source" href="prune.js.html">
+                  prune.js
+                </a>
+
+
+                <a class="source" href="redux.js.html">
+                  redux.js
+                </a>
+
+
+                <a class="source" href="rescue.js.html">
+                  rescue.js
+                </a>
+
+
+                <a class="source" href="rescue.t.js.html">
+                  rescue.t.js
+                </a>
+
+
+                <a class="source" href="readme.t.js.html">
+                  readme.t.js
+                </a>
+
+
+                <a class="source" href="tree.js.html">
+                  tree.js
+                </a>
+
+            </div>
+          </div>
+        </li>
+      </ul>
+
+    <ul class="sections">
+
+          <li id="title">
+              <div class="annotation">
+                  <h1>find.js</h1>
+              </div>
+          </li>
+
+
+
+        <li id="section-1">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <p>The innner decend returns true if the the <code>node</code> would match a pattern, have
+itself or all its children removed, from consideration, this used to be
+called pruning, so let’s call it pruning. The inner <code>descend</code> returns true if
+the node is pruned from the tree.</p>
+
+            </div>
+
+        </li>
+
+
+        <li id="section-2">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>There is special case with the root node. It is always a dummy node. When we
+start from a root error, we only need to check the return value of descend.</p>
+
+            </div>
+
+        </li>
+
+
+        <li id="section-3">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>When we reach a fork in the path we have to winnow the list of errors with
+calls to find. In this case we do not want the boolean value. We want to get
+a list of what matched and then remove that list of an ever shrinking list of
+errors. This is when we pass in an external <code>filtered</code>.</p>
+
+            </div>
+
+        </li>
+
+
+        <li id="section-4">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>This function depends on the structure created by the compiler. The compiler
+is descending the user’s tree of logic, the pattern, while <code>find</code> descends
+the tree of errors.</p>
+
+            </div>
+
+        </li>
+
+
+        <li id="section-5">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-keyword">const</span> assert = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;assert&#x27;</span>)
+
+<span class="hljs-keyword">const</span> Prune = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./prune&#x27;</span>)
+
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">limit, dive, test, tree</span>) </span>{
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">find</span> (<span class="hljs-params">found, limit, dive, test, node</span>) </span>{
+        <span class="hljs-keyword">let</span> forked = <span class="hljs-literal">false</span>
+
+        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">descend</span> (<span class="hljs-params">node, dive, test, depth</span>) </span>{
+            <span class="hljs-keyword">if</span> (depth &gt; dive[<span class="hljs-number">1</span>]) {
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (depth &lt; dive[<span class="hljs-number">0</span>]) {
+                node.errors.forEach(<span class="hljs-function"><span class="hljs-params">error</span> =&gt;</span> descend(error, dive, test, depth + <span class="hljs-number">1</span>))
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-keyword">const</span> matches = test(tree.ordered[node.index])
+                <span class="hljs-keyword">if</span> (matches == <span class="hljs-literal">null</span>) {
+                    node.errors.forEach(<span class="hljs-function"><span class="hljs-params">error</span> =&gt;</span> descend(error, dive, test, depth + <span class="hljs-number">1</span>))
+                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Array</span>.isArray(matches)) {
+                    forked = <span class="hljs-literal">true</span>
+                    assert(limit == -<span class="hljs-number">1</span>, <span class="hljs-string">&#x27;limit can only be specified in leaf alternates&#x27;</span>)
+                    fork(found, matches, node)
+                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (matches.dive.length == <span class="hljs-number">0</span>) {
+                    found.push(node.id)
+                } <span class="hljs-keyword">else</span> {
+                    <span class="hljs-keyword">const</span> subDive = matches.dive.map(<span class="hljs-function"><span class="hljs-params">value</span> =&gt;</span> value == <span class="hljs-built_in">Number</span>.MAX_SAFE_INTEGER ? value : value + depth + <span class="hljs-number">1</span>)
+                    node.errors.forEach(<span class="hljs-function"><span class="hljs-params">error</span> =&gt;</span> descend(error, subDive, matches.test, depth + <span class="hljs-number">1</span>))
+                }
+            }
+        }
+
+        descend(node, dive, test, <span class="hljs-number">0</span>)
+
+        <span class="hljs-keyword">return</span> forked
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fork</span> (<span class="hljs-params">found, matches, node</span>) </span>{
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> match <span class="hljs-keyword">of</span> matches) {
+            <span class="hljs-keyword">const</span> _found = []
+            <span class="hljs-keyword">const</span> forked = find(_found, match.limit, match.dive, match.test, node)
+            <span class="hljs-keyword">if</span> (forked) {
+                <span class="hljs-keyword">if</span> (node.errors.length == <span class="hljs-number">0</span>) {
+                    found.push.apply(found, _found)
+                }
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-keyword">if</span> ((limit == <span class="hljs-number">0</span> &amp;&amp; _found.length != <span class="hljs-number">0</span>) || (limit == -<span class="hljs-number">1</span> &amp;&amp; _found.length == <span class="hljs-number">1</span>) || _found.length == limit) {
+                    Prune(tree, _found)
+                    found.push.apply(found, _found)
+                }
+            }
+        }
+    }
+
+    <span class="hljs-keyword">const</span> found = []
+    fork(found, [{ limit, dive, test }], tree)
+    <span class="hljs-keyword">if</span> (tree.errors.length == <span class="hljs-number">0</span>) {
+        <span class="hljs-keyword">return</span> found
+    }
+
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>
+}</pre></div></div>
+
+        </li>
+
+    </ul>
+  </div>
+</body>
+</html>
