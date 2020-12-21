@@ -1,7 +1,7 @@
 require('proof')(1, (okay) => {
     const foo = require('./foo')
     const tree = require('../tree')
-    okay(tree(foo).errors[0], {
+    okay(tree(foo).node.errors[0], {
         id: 2,
         index: 0,
         message: 'foo',
@@ -74,10 +74,21 @@ require('proof')(1, (okay) => {
     // Oddly, I have no way of dealing with ciruclar references in Interrupt
     // yet, would cause a stack explosion, so I should probably deal with it
     // there as well.
-    return
+    debugger
     const error = new Error('error')
-    const thrown = new Error('error')
+    const thrown = new Error('thrown')
     error.errors = [ thrown ]
     thrown.errors = [ error ]
-    console.log(tree(error))
+    const t = tree(error)
+    console.log(require('util').inspect(t.node, { depth: null }))
+
+    {
+        const raised = new Error('raised')
+        const thrown = new Error('thrown')
+        const flung = new Error('flung')
+        raised.errors = [ thrown ]
+        thrown.errors = [ raised, flung ]
+        const t = tree(thrown)
+        console.log(require('util').inspect(t.node, { depth: null }))
+    }
 })

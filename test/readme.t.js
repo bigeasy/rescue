@@ -46,7 +46,7 @@
 // Out unit test begins here.
 
 //
-require('proof')(33, okay => {
+require('proof')(34, okay => {
     // We are going to use Node.js assert to make sure we do not overshoot a
     // line that should have raised an exception.
 
@@ -566,5 +566,83 @@ require('proof')(33, okay => {
     } catch (error) {
         const value = rescue(error, [ 'thrown', Symbol, Symbol.iterator ]).errors.shift()
         okay(value, Symbol.iterator, 'catch symbol')
+    }
+    //
+
+    // Rescue can even handle circular references in your error heirarchy.
+
+    //
+    try {
+        const raised = new Error('raised')
+        const thrown = new Error('thrown')
+        raised.errors = [ thrown ]
+        thrown.errors = [ raised ]
+        throw thrown
+    } catch (error) {
+        debugger
+        const caught = rescue(error, [ 'thrown', Error, 'raised', Error, 'thrown', Error, 'raised', Error, 'thrown' ]).errors.shift()
+        okay(caught.message, 'thrown', 'matched through a circular reference')
+    }
+    //
+
+    // Circular references are tricky, however. When rescue matches a path in a
+    // fork it prunes it from the heirarchy so it won't be matched a second
+    // time. Circular references can cause us to prune the path we followed to
+    // get to the fork.
+
+    // This is exceedingly uncommon. Circular references in error heirarchies
+    // are exceedingly rare. The chances that you'd compose a pattern that does
+    // this is also unlikely. You can still take control of the pattern so that
+    // it doesn't cause problems.
+
+    // Here we fork after thrown and first remove raised then remove flung.
+
+    //
+    try {
+        const raised = new Error('raised')
+        const thrown = new Error('thrown')
+        const flung = new Error('flung')
+        raised.errors = [ thrown ]
+        thrown.errors = [ raised, flung ]
+        throw thrown
+    } catch (error) {
+        const caught = rescue(error, [ 'thrown', Error, 'raised', Error, 'thrown', [[ 'raised' ], [ 'flung' ]] ]).errors
+        console.log(caught.map(error => error.message))
+    }
+    // **TODO** Close. Still something to do with the proper parent. Here we are
+    // removing thrown, but when we match we do not reoving it from raised, we
+    // remove it from the root. Also, a missed match with infinate depth would
+    // search forever, so we have to have a terminator inside find so taht we do
+    // not repeat a cycle when finding, so I suppose we keep a path, and that
+    // path is probably concerned with parents as well.
+
+    // **TODO** Okay. How about... What if... When we decend the tree looking
+    // for a node, when we encounter a cycle we replace the node by constructing
+    // it. If we match we reset a cycle counter. If we do not match then when we
+    // hit a cycle again we give up on that path. The cycle counter could be a
+    // path instead of a counter, we search to see if we've already seen this
+    // node. If so, we give up. When we match we reset the path to no path.
+
+    // So we tell the user the when there are circular references, for the
+    // purposes of search, we vivify this tree in order to match it. That way,
+    // if we prune the tree when we match, we do not prune ealier matches. That
+    // is if the root a has chilren [ a, b ] and we search [ a, a, [ a, b ]] we do not
+    // satisfy the match all condition becasue we matched the second `a` has a
+    // `b` sibling that was not matched.
+
+    // We will not blow the stack because we are driven by the pattern which can
+    // detect the cycles and know that a particlar search his hopeless.
+    return
+    try {
+        const raised = new Error('raised')
+        const thrown = new Error('thrown')
+        const flung = new Error('flung')
+        thrown.errors = [ raised, flung ]
+        raised.errors = [ thrown ]
+        throw thrown
+    } catch (error) {
+        debugger
+        const caught = rescue(error, [ 'thrown', Error, [[ 'raised', Error, 'thrown', Error, 'raised', Error, 'thrown' ], [ 'flung' ]] ]).errors
+        console.log(caught.map(error => error.message))
     }
 })

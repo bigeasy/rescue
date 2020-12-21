@@ -26,11 +26,17 @@ module.exports = function (limit, dive, test, tree) {
         let forked = false
 
         function descend (node, dive, test, depth) {
+            if (node.type == 'cycle') {
+                const sought = node.index
+                do {
+                    node = tree.nodes[node.parent]
+                } while (node.index != sought)
+            }
             if (depth > dive[1]) {
             } else if (depth < dive[0]) {
                 node.errors.forEach(error => descend(error, dive, test, depth + 1))
             } else {
-                const matches = test(tree.ordered[node.index])
+                const matches = test(tree.errors[node.index])
                 if (matches == null) {
                     node.errors.forEach(error => descend(error, dive, test, depth + 1))
                 } else if (Array.isArray(matches)) {
@@ -69,8 +75,8 @@ module.exports = function (limit, dive, test, tree) {
     }
 
     const found = []
-    fork(found, [{ limit, dive, test }], tree)
-    if (tree.errors.length == 0) {
+    fork(found, [{ limit, dive, test }], tree.node)
+    if (tree.node.errors.length == 0) {
         return found
     }
 

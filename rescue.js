@@ -49,7 +49,7 @@ function rescue (error, pattern) {
             const tree = Tree(error)
             const found = Find(compiled.match, compiled.dive, compiled.test, tree)
             if (found != null) {
-                return new Rescue(code, found.map(id => tree.ordered[tree.nodes[id].index]))
+                return new Rescue(code, found.map(id => tree.errors[tree.nodes[id].index]))
             }
         }
         throw error
