@@ -7,6 +7,5 @@ require('proof')(1, okay => {
     const tree = Tree(new Error('hello'))
     const ast = Parse([ 'hello' ])
     const pcode = Compile(ast)
-    debugger
-    okay(Find(pcode.match, pcode.dive, pcode.test, tree), [ 2 ], 'found')
+    okay(Find(pcode.match, pcode.partial, pcode.dive, pcode.test, tree), [ 2 ], 'found')
 })
