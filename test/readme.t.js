@@ -46,7 +46,7 @@
 // Out unit test begins here.
 
 //
-require('proof')(34, okay => {
+require('proof')(36, okay => {
     // We are going to use Node.js assert to make sure we do not overshoot a
     // line that should have raised an exception.
 
@@ -579,9 +579,41 @@ require('proof')(34, okay => {
         thrown.errors = [ raised ]
         throw thrown
     } catch (error) {
-        debugger
         const caught = rescue(error, [ 'thrown', Error, 'raised', Error, 'thrown', Error, 'raised', Error, 'thrown' ]).errors.shift()
         okay(caught.message, 'thrown', 'matched through a circular reference')
+    }
+    //
+
+    // An even uglier case.
+
+    //
+    try {
+        const thrown = new Error('thrown')
+        thrown.errors = [ thrown ]
+        throw thrown
+    } catch (error) {
+        const caught = rescue(error, [ 'thrown', Error, 'thrown', Error, 'thrown', Error, 'thrown', Error, 'thrown' ]).errors.shift()
+        okay(caught.message, 'thrown', 'matched through a self reference')
+    }
+    //
+
+    // No problem if we don't match, even though rescue searches for infinate
+    // depth. It will detect the cycle and give up.
+
+    //
+    try {
+        try {
+            const raised = new Error('raised')
+            const thrown = new Error('thrown')
+            raised.errors = [ thrown ]
+            thrown.errors = [ raised ]
+            throw thrown
+        } catch (error) {
+            rescue(error, [ 'error' ])
+            assert(false)
+        }
+    } catch (error) {
+        okay(error.message, 'thrown', 'did not catch a circular reference that didn\'t match')
     }
     //
 
@@ -597,6 +629,7 @@ require('proof')(34, okay => {
 
     // Here we fork after thrown and first remove raised then remove flung.
 
+    return
     //
     try {
         const raised = new Error('raised')
@@ -606,6 +639,7 @@ require('proof')(34, okay => {
         thrown.errors = [ raised, flung ]
         throw thrown
     } catch (error) {
+            debugger
         const caught = rescue(error, [ 'thrown', Error, 'raised', Error, 'thrown', [[ 'raised' ], [ 'flung' ]] ]).errors
         console.log(caught.map(error => error.message))
     }
@@ -632,6 +666,9 @@ require('proof')(34, okay => {
 
     // We will not blow the stack because we are driven by the pattern which can
     // detect the cycles and know that a particlar search his hopeless.
+
+    // **TODO** Got it all working. Circular reference documentation will be
+    // difficult, but matching circular references will also be difficult, so..
     return
     try {
         const raised = new Error('raised')

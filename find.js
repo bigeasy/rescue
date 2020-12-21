@@ -22,23 +22,48 @@ const assert = require('assert')
 const Prune = require('./prune')
 
 module.exports = function (limit, dive, test, tree) {
+    function vivify (source, parent) {
+        if (source.type == 'cycle') {
+            return { ...source, parent }
+        } else {
+            const node = { ...source, parent, id: tree.nodes.length, errors: [] }
+            tree.nodes.push(node)
+            for (const child of source.errors) {
+                node.errors.push(vivify(child, node.id))
+            }
+            return node
+        }
+    }
+
     function find (found, limit, dive, test, node) {
         let forked = false
 
-        function descend (node, dive, test, depth) {
+        function descend (node, dive, test, depth, path) {
+            const index = node.index
             if (node.type == 'cycle') {
-                const sought = node.index
-                do {
-                    node = tree.nodes[node.parent]
-                } while (node.index != sought)
+                if (~path.indexOf(index)) {
+                    // You safely can add `1` to `MAX_SAFE_INTEGER`.
+                    // https://tc39.es/ecma262/#sec-number.max_safe_integer
+                    depth = Number.MAX_SAFE_INTEGER + 1
+                } else {
+                    let source = node
+                    do {
+                       source = tree.nodes[source.parent]
+                    } while (source.index != index)
+                    const parent = tree.nodes[node.parent]
+                    const vivified = vivify(source, node.parent)
+                    parent.errors.splice(parent.errors.indexOf(node), 1, vivified)
+                    node = vivified
+                }
             }
             if (depth > dive[1]) {
             } else if (depth < dive[0]) {
-                node.errors.forEach(error => descend(error, dive, test, depth + 1))
+                node.errors.forEach(error => descend(error, dive, test, depth + 1, path))
             } else {
                 const matches = test(tree.errors[node.index])
                 if (matches == null) {
-                    node.errors.forEach(error => descend(error, dive, test, depth + 1))
+                    path = path.concat(index)
+                    node.errors.forEach(error => descend(error, dive, test, depth + 1, path))
                 } else if (Array.isArray(matches)) {
                     forked = true
                     assert(limit == -1, 'limit can only be specified in leaf alternates')
@@ -46,13 +71,14 @@ module.exports = function (limit, dive, test, tree) {
                 } else if (matches.dive.length == 0) {
                     found.push(node.id)
                 } else {
+                    path = []
                     const subDive = matches.dive.map(value => value == Number.MAX_SAFE_INTEGER ? value : value + depth + 1)
-                    node.errors.forEach(error => descend(error, subDive, matches.test, depth + 1))
+                    node.errors.forEach(error => descend(error, subDive, matches.test, depth + 1, path))
                 }
             }
         }
 
-        descend(node, dive, test, 0)
+        descend(node, dive, test, 0, [])
 
         return forked
     }
