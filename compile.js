@@ -9,35 +9,17 @@ function sortof (value) {
 
 function condition (test) {
     const conditions = []
-    switch (test.type) {
-    case 'root': {
-            return conditions
-        }
-    case 'error': {
-            conditions.push(e => e instanceof test.error)
-            for (const pattern of test.patterns) {
-                conditions.push(value => subordinate(value, pattern))
-            }
-            return conditions
-        }
-    case 'boolean':
-    case 'number':
-    case 'string': {
-            conditions.push(value => typeof value == test.type)
-            for (const pattern of test.patterns) {
-                conditions.push(value => subordinate(value, pattern))
-            }
-            return conditions
-        }
-    case 'bigint':
-    case 'symbol': {
+    if (test.type != 'root') {
+        if (typeof test.type == 'string') {
             conditions.push(value => sortof(value) == test.type)
-            for (const pattern of test.patterns) {
-                conditions.push(value => subordinate(value, pattern))
-            }
-            return conditions
+        } else {
+            conditions.push(value => value instanceof test.type)
+        }
+        for (const pattern of test.patterns) {
+            conditions.push(value => subordinate(value, pattern))
         }
     }
+    return conditions
 }
 
 function compile ({ test, next }) {

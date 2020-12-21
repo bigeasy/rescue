@@ -53,32 +53,6 @@ module.exports = function (pattern, { display = false } = {}) {
     }
 
     const descend = [ 'BigInt', 'Symbol', 'Error', 'array', 'Number', 'Boolean', 'String' ]
-    const expected = {
-        error: [ 'range', 'object', 'string', 'regex' ],
-        symbol: [ 'range', 'symbol' ],
-        array: [ 'array' ],
-        number: [ 'number', 'range' ],
-        bool: [ 'bool' ],
-        string: [ 'string' ],
-        bigint: [ 'bigint' ]
-    }
-
-    function range (range, object, value) {
-        switch (range) {
-        case 'max': {
-                object.dive[1] = value
-                return 'min'
-            }
-        case 'min': {
-                object.dive[0] = object.dive[1]
-                object.dive[1] = value
-                return 'done'
-            }
-        case 'done': {
-                throw new Error('unexpected range')
-            }
-        }
-    }
 
     class Parser {
         static newable = true
@@ -86,35 +60,37 @@ module.exports = function (pattern, { display = false } = {}) {
         constructor (mode, type, accepted) {
             this.ranges = []
             this.mode = mode
-            this.type = type
+            this.type = typeof type == 'string' || ! display ? type : type.prototype.constructor.name
             this.patterns = []
             this.errors = []
             this.accepted = accepted
         }
 
         consume (type, value) {
-            if (~this.accepted.indexOf(type)) {
-                switch (type) {
-                case 'range': {
-                        this.ranges.push(value)
-                    }
-                    break
-                case 'string':
-                case 'regex': {
-                        this.patterns.push({ message: display ? value.toString() : value })
-                    }
-                    break
-                case 'symbol': {
-                        this.patterns.push(display ? value.toString() : value)
-                    }
-                    break
-                case 'object': {
-                        this.patterns.push(value)
-                    }
-                    break
+            switch (type) {
+            case 'range': {
+                    assert(this.patterns.length == 0)
+                    assert(this.ranges.length < 2)
+                    this.ranges.push(value)
                 }
-            } else {
-                this.errors.push(new Rescue.Error('UNEXPECTED_CONDITION_TYPE', 0, { mode: this.mode, type }))
+                break
+            case 'number': {
+                    this.patterns.push(value)
+                }
+                break
+            case 'string':
+            case 'regex': {
+                    this.patterns.push(display ? value.toString() : value)
+                }
+                break
+            case 'symbol': {
+                    this.patterns.push(display ? value.toString() : value)
+                }
+                break
+            case 'object': {
+                    this.patterns.push(value)
+                }
+                break
             }
         }
 
@@ -142,69 +118,45 @@ module.exports = function (pattern, { display = false } = {}) {
     }
 
     const parsers = {
-        array: function (object, value) {
-            const forks = []
-            for (const branch of value) {
-                assert(Array.isArray(branch))
-                forks.push(assume(branch.slice()))
+        array: class {
+            static newable = true
+
+            constructor (value) {
+                this.forks = []
+                for (const branch of value) {
+                    assert(Array.isArray(branch))
+                    this.forks.push(assume(branch.slice()))
+                }
             }
-            return {
-                done () {
-                    return forks
+
+            consume () {
+                assert(false)
+            }
+
+            done () {
+                return this.forks
+            }
+        },
+        error: class extends Parser {
+            constructor (value) {
+                super('error', value, [ 'range', 'string', 'regex', 'object' ])
+            }
+
+            consume (type, value) {
+                switch (type) {
+                case 'string':
+                case 'regex':
+                    super.consume('object', { message: display ? value.toString() : value })
+                    break
+                default:
+                    super.consume(type, value)
+                    break
                 }
             }
         },
-        error: function (object, value) {
-            object.test = { ...object.test, patterns: [], error: display ? value.prototype.name : value }
-            return {
-                range: 'max',
-                mode: 'error',
-                consume (type, value) {
-                    switch (type) {
-                    case 'range': {
-                            this.range = range(this.range, object, value)
-                        }
-                        break
-                    case 'string':
-                    case 'regex': {
-                            object.test.patterns.push({ message: display ? value.toString() : value })
-                        }
-                        break
-                    case 'object': {
-                            object.test.patterns.push(value)
-                        }
-                        break
-                    }
-                },
-                done (next = null) {
-                    return { ...object, next }
-                }
-            }
-        },
-        string: function (object, value) {
-            object.test = { ...object.test, patterns: [] }
-            return {
-                range: 'max',
-                mode: 'string',
-                consume (type, value) {
-                    switch (type) {
-                    case 'range': {
-                            this.range = range(this.range, object, value)
-                        }
-                        break
-                    case 'regex': {
-                            object.test.patterns.push(display ? value.toString() : value)
-                        }
-                        break
-                    case 'string': {
-                            object.test.patterns.push(value)
-                        }
-                        break
-                    }
-                },
-                done (next = null) {
-                    return { ...object, next }
-                }
+        string: class extends Parser {
+            constructor () {
+                super('string', 'string', [ 'range', 'string' ])
             }
         },
         symbol: class extends Parser {
@@ -217,65 +169,44 @@ module.exports = function (pattern, { display = false } = {}) {
                 super('bigint', 'bigint', [ 'range', 'bigint' ])
             }
         },
-        boolean: function (object, value) {
-            object.test = { ...object.test, patterns: [] }
-            return {
-                range: 'max',
-                mode: 'boolean',
-                consume (type, value) {
-                    switch (type) {
-                        case 'range': {
-                                this.range = range(this.range, object, value)
-                            }
-                            break
-                        case 'boolean': {
-                                object.test.patterns(value)
-                            }
-                            break
-                    }
-                },
-                done (next = null) {
-                    return { ...object, next }
-                }
+        boolean: class extends Parser {
+            constructor () {
+                super('boolean', 'boolean', [ 'range', 'boolean', 'regex' ])
             }
         },
-        number: function (object, value) {
-            object.test = { ...object.test, patterns: [] }
-            let _value = null, wasRange = false
-            const values = []
-            return {
-                range: 'max',
-                mode: 'number',
-                consume (type, value) {
-                    switch (type) {
-                        case 'number':
-                        case 'range': {
-                            values.push({ type, value })
-                        }
-                        break
+        number: class extends Parser {
+            constructor () {
+                super('number', 'number', [ 'range', 'number', 'regex' ])
+                this.backlog = []
+            }
 
+            consume (type, value) {
+                this.backlog.push({ type, value })
+            }
+
+            done (next = null) {
+                switch (this.backlog.length) {
+                case 0:
+                case 1: {
+                        for (const { type, value } of this.backlog) {
+                            super.consume(type == 'range' ? 'number' : type, value)
+                        }
                     }
-                },
-                done (next = null) {
-                    assert(values.length <= 3)
-                    if (values.length != 0) {
-                        object.test.patterns.push(values.pop().value)
+                    break
+                default: {
+                        let count = 2
+                        while (--count && this.backlog.length && this.backlog[0].type == 'range') {
+                            super.consume('range', this.backlog.shift().value)
+                        }
+                        for (const { type, value } of this.backlog) {
+                            super.consume(type == 'range' ? 'number' : type, value)
+                        }
                     }
-                    while (values.length > 2) {
-                        object.test.patterns.push(values.pop().value)
-                    }
-                    assert(values.every(value => value.type == 'range'))
-                    while (values.length != 0) {
-                        object.range = range(this.range, object, values.shift().value)
-                    }
-                    return { ...object, next }
+                    break
                 }
+                return super.done(next)
             }
         }
-    }
-
-    function createObject (type) {
-        return { dive: [ 0, Number.MAX_SAFE_INTEGER ], test: { type: type.toLowerCase() }, next: null }
     }
 
     function parse (pattern, parser) {
@@ -285,18 +216,9 @@ module.exports = function (pattern, { display = false } = {}) {
             const type = qualify(value)
             if (~descend.indexOf(type)) {
                 const builder = parsers[type.toLowerCase()]
-                if (builder.newable) {
-                    return parser.done(parse(pattern, new builder(value)))
-                } else {
-                    return parser.done(parse(pattern, builder(createObject(type), value)))
-                }
+                return parser.done(parse(pattern, new builder(value)))
             } else {
-                // **TODO** Outgoing check in consume.
-                if (parser.accepted) {
-                    Rescue.Error.assert(~parser.accepted.indexOf(type), 'PATTERN_TYPE_ERROR', { _mode: parser.mode, _type: type })
-                } else {
-                    assert(~expected[parser.mode].indexOf(type))
-                }
+                Rescue.Error.assert(~parser.accepted.indexOf(type), 'PATTERN_TYPE_ERROR', { _mode: parser.mode, _type: type })
                 parser.consume(type, value)
             }
         }
@@ -325,14 +247,14 @@ module.exports = function (pattern, { display = false } = {}) {
                 ...options,
                 dive: [ 0, 0 ],
                 test: { type: 'root' },
-                next: parse(pattern, new parsers[type.toLowerCase()](createObject(type), pattern.shift()))
+                next: parse(pattern, new parsers[type.toLowerCase()](pattern.shift()))
             }
         }
         return {
             ...options,
             dive: [ 0, 0 ],
             test: { type: 'root' },
-            next: parse(pattern, new parsers.error(createObject('Error'), Error))
+            next: parse(pattern, new parsers.error(Error))
         }
     }
 

@@ -546,6 +546,7 @@ require('proof')(38, okay => {
     try {
         throw false
     } catch (error) {
+        debugger
         const value = rescue(error, [ Boolean ]).errors.shift()
         okay(value, false, 'caught a boolean by type')
     }

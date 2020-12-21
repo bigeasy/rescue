@@ -7,7 +7,7 @@ require('proof')(8, okay => {
         test: { type: 'root' },
         next: {
             dive: [ 0, Number.MAX_SAFE_INTEGER ],
-            test: { type: 'error', patterns: [], error: 'Error' },
+            test: { type: 'Error', patterns: [] },
             next: null
         }
     }, 'error')
@@ -19,9 +19,8 @@ require('proof')(8, okay => {
         next: {
             dive: [ 0, Number.MAX_SAFE_INTEGER ],
             test: {
-                type: 'error',
-                patterns: [{ message: 'hello' }],
-                error: 'Error'
+                type: 'Error',
+                patterns: [{ message: 'hello' }]
             },
             next: null
         }
@@ -34,9 +33,8 @@ require('proof')(8, okay => {
         next: {
             dive: [ 0, Number.MAX_SAFE_INTEGER ],
             test: {
-                type: 'error',
-                patterns: [{ message: '/hello/' }],
-                error: 'Error'
+                type: 'Error',
+                patterns: [{ message: '/hello/' }]
             },
             next: null
         }
@@ -49,9 +47,8 @@ require('proof')(8, okay => {
         next: {
             dive: [ 0, Number.MAX_SAFE_INTEGER ],
             test: {
-                type: 'error',
-                patterns: [{ code: 'ENOENT' }],
-                error: 'Error'
+                type: 'Error',
+                patterns: [{ code: 'ENOENT' }]
             },
             next: null
         }
@@ -64,9 +61,8 @@ require('proof')(8, okay => {
         next: {
             dive: [ 0, 1 ],
             test: {
-                type: 'error',
-                patterns: [{ message: 'message' }],
-                error: 'Error'
+                type: 'Error',
+                patterns: [{ message: 'message' }]
             },
             next: null
         }
@@ -79,16 +75,14 @@ require('proof')(8, okay => {
         next: {
             dive: [ 0, Number.MAX_SAFE_INTEGER ],
             test: {
-                type: 'error',
-                patterns: [{ message: 'message' }],
-                error: 'Error'
+                type: 'Error',
+                patterns: [{ message: 'message' }]
             },
             next: {
                 dive: [ 0, Number.MAX_SAFE_INTEGER ],
                 test: {
-                    type: 'error',
-                    patterns: [{ message: 'message' }],
-                    error: 'Error'
+                    type: 'Error',
+                    patterns: [{ message: 'message' }]
                 },
                 next: null
             }
@@ -102,9 +96,8 @@ require('proof')(8, okay => {
         next: {
             dive: [ 0, Number.MAX_SAFE_INTEGER ],
             test: {
-                type: 'error',
-                patterns: [{ message: 'message' }],
-                error: 'Error'
+                type: 'Error',
+                patterns: [{ message: 'message' }]
             },
             next: [{
                 match: -1,
@@ -114,9 +107,8 @@ require('proof')(8, okay => {
                 next: {
                     dive: [ 0, Number.MAX_SAFE_INTEGER ],
                     test: {
-                        type: 'error',
-                        patterns: [{ message: 'first' }],
-                        error: 'Error'
+                        type: 'Error',
+                        patterns: [{ message: 'first' }]
                     },
                     next: null
                 }
@@ -128,9 +120,8 @@ require('proof')(8, okay => {
                 next: {
                     dive: [ 0, Number.MAX_SAFE_INTEGER ],
                     test: {
-                        type: 'error',
-                        patterns: [{ message: 'second' }],
-                        error: 'Error'
+                        type: 'Error',
+                        patterns: [{ message: 'second' }]
                     },
                     next: null
                 }
