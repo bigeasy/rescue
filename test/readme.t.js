@@ -46,7 +46,7 @@
 // Out unit test begins here.
 
 //
-require('proof')(37, okay => {
+require('proof')(38, okay => {
     // We are going to use Node.js assert to make sure we do not overshoot a
     // line that should have raised an exception.
 
@@ -566,6 +566,16 @@ require('proof')(37, okay => {
     } catch (error) {
         const value = rescue(error, [ 'thrown', Symbol, Symbol.iterator ]).errors.shift()
         okay(value, Symbol.iterator, 'catch symbol')
+    }
+    //
+
+    // You can catch BigInts.
+    //
+    try {
+        throw 1n
+    } catch (error) {
+        const value = rescue(error, [ BigInt, 1n ]).errors.shift()
+        okay(value, 1n, 'caught a BigInt')
     }
     //
 

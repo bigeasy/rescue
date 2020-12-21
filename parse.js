@@ -2,7 +2,6 @@ const assert = require('assert')
 
 const Rescue = { Error: require('./error') }
 
-
 module.exports = function (pattern, { display = false } = {}) {
     // For all the basic types, primitive and native objects...
     //
@@ -45,6 +44,7 @@ module.exports = function (pattern, { display = false } = {}) {
             }
             return type
         case 'string':
+        case 'bigint':
         case 'symbol':
         case 'object':
         case 'array':
@@ -52,7 +52,7 @@ module.exports = function (pattern, { display = false } = {}) {
         }
     }
 
-    const descend = [ 'Symbol', 'Error', 'array', 'Number', 'Boolean', 'String' ]
+    const descend = [ 'BigInt', 'Symbol', 'Error', 'array', 'Number', 'Boolean', 'String' ]
     const expected = {
         error: [ 'range', 'object', 'string', 'regex' ],
         symbol: [ 'range', 'symbol' ],
@@ -207,31 +207,14 @@ module.exports = function (pattern, { display = false } = {}) {
                 }
             }
         },
-        bigint: function (object, value) {
-            object.test = { ...object.test, patterns: [] }
-            return {
-                range: 'max',
-                mode: 'boolean',
-                consume (type, value) {
-                    switch (type) {
-                        case 'range': {
-                                this.range = range(this.range, object, value)
-                            }
-                            break
-                        case 'bigint': {
-                                object.test.patterns(value)
-                            }
-                            break
-                    }
-                },
-                done (next = null) {
-                    return { ...object, next }
-                }
-            }
-        },
         symbol: class extends Parser {
             constructor () {
                 super('symbol', 'symbol', [ 'range', 'symbol' ])
+            }
+        },
+        bigint: class extends Parser {
+            constructor () {
+                super('bigint', 'bigint', [ 'range', 'bigint' ])
             }
         },
         boolean: function (object, value) {
@@ -309,7 +292,11 @@ module.exports = function (pattern, { display = false } = {}) {
                 }
             } else {
                 // **TODO** Outgoing check in consume.
-                assert(~expected[parser.mode].indexOf(type))
+                if (parser.accepted) {
+                    Rescue.Error.assert(~parser.accepted.indexOf(type), 'PATTERN_TYPE_ERROR', { _mode: parser.mode, _type: type })
+                } else {
+                    assert(~expected[parser.mode].indexOf(type))
+                }
                 parser.consume(type, value)
             }
         }
@@ -338,14 +325,14 @@ module.exports = function (pattern, { display = false } = {}) {
                 ...options,
                 dive: [ 0, 0 ],
                 test: { type: 'root' },
-                next: parse(pattern, parsers[type.toLowerCase()](createObject(type), pattern.shift()))
+                next: parse(pattern, new parsers[type.toLowerCase()](createObject(type), pattern.shift()))
             }
         }
         return {
             ...options,
             dive: [ 0, 0 ],
             test: { type: 'root' },
-            next: parse(pattern, parsers.error(createObject('Error'), Error))
+            next: parse(pattern, new parsers.error(createObject('Error'), Error))
         }
     }
 

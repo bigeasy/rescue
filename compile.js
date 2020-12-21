@@ -29,6 +29,7 @@ function condition (test) {
             }
             return conditions
         }
+    case 'bigint':
     case 'symbol': {
             conditions.push(value => sortof(value) == test.type)
             for (const pattern of test.patterns) {
