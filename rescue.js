@@ -47,7 +47,7 @@ function rescue (error, pattern) {
         for (const code in patterns) {
             const compiled = patterns[code]
             const tree = Tree(error)
-            const found = Find(compiled.match, compiled.dive, compiled.test, tree)
+            const found = Find(compiled.match, compiled.partial, compiled.dive, compiled.test, tree)
             if (found != null) {
                 return new Rescue(code, found.map(id => tree.errors[tree.nodes[id].index]))
             }

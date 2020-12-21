@@ -319,12 +319,17 @@ module.exports = function (pattern, { display = false } = {}) {
     // If we do not have a type specified as the first argument, we assume
     // `Error` is the desired type.
     function assume (pattern) {
-        const options = { match: -1 }
+        const options = { match: -1, partial: false }
         if (Array.isArray(pattern[0])) {
             if (!pattern[0].every(element => Array.isArray(element))) {
                 const vargs = pattern.shift()
                 assert(vargs.length == 1 && typeof vargs[0] == 'number')
-                options.match = vargs[0]
+                if (vargs < 0) {
+                    options.match = ~vargs[0]
+                    options.partial = true
+                } else {
+                    options.match = vargs[0]
+                }
             }
         }
         const type = qualify(pattern[0])

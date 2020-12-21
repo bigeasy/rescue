@@ -21,7 +21,7 @@ const assert = require('assert')
 
 const Prune = require('./prune')
 
-module.exports = function (limit, dive, test, tree) {
+module.exports = function (limit, partial, dive, test, tree) {
     function vivify (source, parent) {
         if (source.type == 'cycle') {
             return { ...source, parent }
@@ -84,25 +84,35 @@ module.exports = function (limit, dive, test, tree) {
     }
 
     function fork (found, matches, node) {
+        const finds = []
         for (const match of matches) {
             const _found = []
             const forked = find(_found, match.limit, match.dive, match.test, node)
             if (forked) {
-                if (node.errors.length == 0) {
-                    found.push.apply(found, _found)
+                if (node.errors.length == 0 || (partial && _found.length != 0)) {
+                    finds.push(_found)
+                } else {
+                    break
                 }
             } else {
                 if ((limit == 0 && _found.length != 0) || (limit == -1 && _found.length == 1) || _found.length == limit) {
                     Prune(tree, _found)
-                    found.push.apply(found, _found)
+                    finds.push(_found)
+                } else {
+                    break
                 }
+            }
+        }
+        if (finds.length == matches.length) {
+            for (const find of finds) {
+                found.push.apply(found, find)
             }
         }
     }
 
     const found = []
     fork(found, [{ limit, dive, test }], tree.node)
-    if (tree.node.errors.length == 0) {
+    if (tree.node.errors.length == 0 || (partial && found.length != 0)) {
         return found
     }
 

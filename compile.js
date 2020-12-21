@@ -57,5 +57,5 @@ function compile ({ test, next }) {
 }
 
 module.exports = function (ast) {
-    return { match: ast.match, dive: ast.dive, test: compile(ast) }
+    return { match: ast.match, partial: ast.partial, dive: ast.dive, test: compile(ast) }
 }

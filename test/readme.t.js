@@ -46,7 +46,7 @@
 // Out unit test begins here.
 
 //
-require('proof')(36, okay => {
+require('proof')(37, okay => {
     // We are going to use Node.js assert to make sure we do not overshoot a
     // line that should have raised an exception.
 
@@ -628,6 +628,28 @@ require('proof')(36, okay => {
     // it doesn't cause problems.
 
     // Here we fork after thrown and first remove raised then remove flung.
+
+    // **TODO** Inserting partial matches here.
+
+    // As noted, you have to match the entire pattern in or else rescue will
+    // rethrown the error. This is the default behavior and it is good because
+    // without it, you may be swallowing exceptions. If you're certain you can
+    // ignore the other exceptions you can indicate that you want to perform a
+    // partial match by specifying a limit and prefixing it with the bitwise NOT
+    // operator `~`.
+
+    // The mnemonic is that a tilde `~` in the writing can be used to mean
+    // "approximately" and we're happy to match something, but not exactly.
+
+    //
+    try {
+        const error = new Error('aggregate')
+        error.errors = [ new Error('first'), new Error('second') ]
+        throw error
+    } catch (error) {
+        const caught = rescue(error, [ [ ~1 ], 'first' ]).errors.shift()
+        okay(caught.message, 'first', 'matched first message ingored second')
+    }
 
     return
     //
