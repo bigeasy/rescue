@@ -50,6 +50,7 @@ module.exports = function (pattern, { display = false } = {}) {
         case 'symbol':
         case 'object':
         case 'array':
+        case 'function':
             return type
         }
     }
@@ -158,27 +159,27 @@ module.exports = function (pattern, { display = false } = {}) {
         },
         string: class extends Parser {
             constructor () {
-                super('string', 'string', [ 'range', 'string' ])
+                super('string', 'string', [ 'range', 'string', 'function' ])
             }
         },
         symbol: class extends Parser {
             constructor () {
-                super('symbol', 'symbol', [ 'range', 'symbol' ])
+                super('symbol', 'symbol', [ 'range', 'symbol', 'function' ])
             }
         },
         bigint: class extends Parser {
             constructor () {
-                super('bigint', 'bigint', [ 'range', 'bigint' ])
+                super('bigint', 'bigint', [ 'range', 'bigint', 'regex', 'function' ])
             }
         },
         boolean: class extends Parser {
             constructor () {
-                super('boolean', 'boolean', [ 'range', 'boolean', 'regex' ])
+                super('boolean', 'boolean', [ 'range', 'boolean', 'regex', 'function' ])
             }
         },
         number: class extends Parser {
             constructor () {
-                super('number', 'number', [ 'range', 'number', 'regex' ])
+                super('number', 'number', [ 'range', 'number', 'regex', 'function' ])
                 this.backlog = []
             }
 

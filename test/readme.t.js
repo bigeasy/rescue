@@ -609,6 +609,29 @@ require('proof')(40, okay => {
     }
     //
 
+    // String, booleans, numbers and bigints can all be matched using regular
+    // expressions.
+
+    //
+    try {
+        throw 1
+    } catch (error) {
+        const value = rescue(error, [ Number, /^\d+$/ ]).errors.shift()
+        okay(value, 1, 'caught an integer')
+    }
+    //
+
+    // You can also use functions to match primitive types.
+
+    //
+    try {
+        throw 1
+    } catch (error) {
+        const value = rescue(error, [ Number, value => Number.isInteger(value) ]).errors.shift()
+        okay(value, 1, 'caught an integer')
+    }
+    //
+
     // Rescue can even handle circular references in your error heirarchy.
 
     //
