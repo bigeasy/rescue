@@ -448,11 +448,6 @@ require('proof')(38, okay => {
     // Your fork must match all the different possible errors. If it doesn't
     // than the exception is rethrown.
 
-    // **TODO** As of yet, I have no way of specifying a partial match, to say,
-    // yes I want to rescue if this exists and I dont' care about anything else.
-    // I am going to use Rescue as it is for a while and see if I don't
-    // encounter that use case before I implement it.
-
     //
     try {
         try {
@@ -472,6 +467,40 @@ require('proof')(38, okay => {
     } catch (error) {
         okay(error.message, 'parent', 'fork did not match all possible errors')
     }
+    //
+
+    // When rescue matches a path in a fork it is excluded from search when
+    // matching the other forks. This may cause confusion.
+
+    //
+    try {
+        try {
+            const error = new Error('aggregate')
+            const wrapper1 = new Error('wrapper')
+            wrapper1.errors = [ new Error('io') ]
+            const wrapper2 = new Error('wrapper')
+            wrapper2.errors = [ new Error('parse') ]
+            error.errors = [ wrapper1, wrapper2 ]
+            throw error
+        } catch (error) {
+            rescue(error, [ 'aggregate', [[ 'wrapper', Error, 'io' ], [ 'wrapper' ]] ])
+            okay
+            rescue(error, [ 'aggregate', [[ 'wrapper' ], [ 'wrapper', Error, 'io' ]] ])
+        }
+    } catch (error) {
+        okay(error.message, 'aggregate', 'pattern did not match')
+    }
+    //
+
+    // The patterns in the example above look the same, but the first fork
+    // removes the path `'aggregate'`, `'wrapper'`, `'io'` which removes both
+    // the `'io'` error and the `'wrapper'` that contains it. It prunes the tree
+    // of any paths that have no child errors. Then the second fork matches the
+    // remaining `'wrapper'`.
+
+    // The second pattern matches both `'wrapper'` errors, two errors, and
+    // because the default match count is one the exception is rethrown.
+
     //
 
     // If you would like to catch more than one type of exception, you pass an
