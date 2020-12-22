@@ -46,7 +46,7 @@
 // Out unit test begins here.
 
 //
-require('proof')(40, okay => {
+require('proof')(42, okay => {
     // We are going to use Node.js assert to make sure we do not overshoot a
     // line that should have raised an exception.
 
