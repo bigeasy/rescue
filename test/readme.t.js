@@ -46,7 +46,7 @@
 // Out unit test begins here.
 
 //
-require('proof')(42, okay => {
+require('proof')(45, okay => {
     // We are going to use Node.js assert to make sure we do not overshoot a
     // line that should have raised an exception.
 
@@ -629,6 +629,43 @@ require('proof')(42, okay => {
     } catch (error) {
         const value = rescue(error, [ Number, value => Number.isInteger(value) ]).errors.shift()
         okay(value, 1, 'caught an integer')
+    }
+    //
+
+    // When you catch arrays you are not matching them exactly. You are matching
+    // a subset. Does the caught array contain this array?
+
+    //
+    try {
+        throw [ 1, 2, 3 ]
+    } catch (error) {
+        const value = rescue(error, [ Array, [ 1, 3 ] ]).errors.shift()
+        okay(value, [ 1, 2, 3 ], 'caught array by subset')
+    }
+    //
+
+    // The the elements in array pattern you specify must be in the same order
+    // as the elements in the array you indent to catch. If you do not know the
+    // order can specify multiple array patterns to match.
+
+    //
+    try {
+        throw [ 3, 2, 1 ]
+    } catch (error) {
+        const value = rescue(error, [ Array, [ 3 ], [ 1 ] ]).errors.shift()
+        okay(value, [ 3, 2, 1 ], 'caught array by unordered elements')
+    }
+    //
+
+    // Arrays are always matched by subset so if you want to match an array
+    // exactly you have to add a pattern to match the length.
+
+    //
+    try {
+        throw [ 3, 2, 1 ]
+    } catch (error) {
+        const value = rescue(error, [ Array, [ 3, 2, 1 ], { length: 3 } ]).errors.shift()
+        okay(value, [ 3, 2, 1 ], 'caught array by unordered elements')
     }
     //
 

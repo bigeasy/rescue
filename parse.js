@@ -11,7 +11,7 @@ module.exports = function (pattern, { display = false } = {}) {
     // structures](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures).
 
     //
-    const BASICS = new Set([ Error, Number, String, Boolean, Symbol, BigInt ])
+    const BASICS = new Set([ Array, Error, Number, String, Boolean, Symbol, BigInt ])
     //
 
     // News to me after all these years...
@@ -55,10 +55,12 @@ module.exports = function (pattern, { display = false } = {}) {
         }
     }
 
-    const descend = [ 'BigInt', 'Symbol', 'Error', 'array', 'Number', 'Boolean', 'String' ]
+    const descend = [ 'Array', 'BigInt', 'Symbol', 'Error', 'array', 'Number', 'Boolean', 'String' ]
 
     class Parser {
         static newable = true
+
+        descendable = false
 
         constructor (mode, type, accepted) {
             this.ranges = []
@@ -77,19 +79,16 @@ module.exports = function (pattern, { display = false } = {}) {
                     this.ranges.push(value)
                 }
                 break
-            case 'number': {
-                    this.patterns.push(value)
-                }
-                break
             case 'string':
-            case 'regex': {
-                    this.patterns.push(display ? value.toString() : value)
-                }
-                break
+            case 'regex':
             case 'symbol': {
                     this.patterns.push(display ? value.toString() : value)
                 }
                 break
+            case 'bigint':
+            case 'array':
+            case 'number':
+            case 'function':
             case 'object': {
                     this.patterns.push(value)
                 }
@@ -140,7 +139,14 @@ module.exports = function (pattern, { display = false } = {}) {
                 return this.forks
             }
         },
-        error: class extends Parser {
+        Array: class extends Parser {
+            constructor (value) {
+                super('error', value, [ 'range', 'array', 'object', 'function' ])
+            }
+        },
+        Error: class extends Parser {
+            descendable = true
+
             constructor (value) {
                 super('error', value, [ 'range', 'string', 'regex', 'object' ])
             }
@@ -157,27 +163,27 @@ module.exports = function (pattern, { display = false } = {}) {
                 }
             }
         },
-        string: class extends Parser {
+        String: class extends Parser {
             constructor () {
                 super('string', 'string', [ 'range', 'string', 'function' ])
             }
         },
-        symbol: class extends Parser {
+        Symbol: class extends Parser {
             constructor () {
                 super('symbol', 'symbol', [ 'range', 'symbol', 'function' ])
             }
         },
-        bigint: class extends Parser {
+        BigInt: class extends Parser {
             constructor () {
                 super('bigint', 'bigint', [ 'range', 'bigint', 'regex', 'function' ])
             }
         },
-        boolean: class extends Parser {
+        Boolean: class extends Parser {
             constructor () {
                 super('boolean', 'boolean', [ 'range', 'boolean', 'regex', 'function' ])
             }
         },
-        number: class extends Parser {
+        Number: class extends Parser {
             constructor () {
                 super('number', 'number', [ 'range', 'number', 'regex', 'function' ])
                 this.backlog = []
@@ -217,9 +223,8 @@ module.exports = function (pattern, { display = false } = {}) {
             const shifted = pattern.shift()
             const value = shifted === Infinity ? Number.MAX_SAFE_INTEGER : shifted
             const type = qualify(value)
-            if (~descend.indexOf(type)) {
-                const builder = parsers[type.toLowerCase()]
-                return parser.done(parse(pattern, new builder(value)))
+            if (parser.descendable && ~descend.indexOf(type)) {
+                return parser.done(parse(pattern, new parsers[type](value)))
             } else {
                 Rescue.Error.assert(~parser.accepted.indexOf(type), 'PATTERN_TYPE_ERROR', { _mode: parser.mode, _type: type })
                 parser.consume(type, value)
@@ -250,14 +255,14 @@ module.exports = function (pattern, { display = false } = {}) {
                 ...options,
                 dive: [ 0, 0 ],
                 test: { type: 'root' },
-                next: parse(pattern, new parsers[type.toLowerCase()](pattern.shift()))
+                next: parse(pattern, new parsers[type](pattern.shift()))
             }
         }
         return {
             ...options,
             dive: [ 0, 0 ],
             test: { type: 'root' },
-            next: parse(pattern, new parsers.error(Error))
+            next: parse(pattern, new parsers.Error(Error))
         }
     }
 
