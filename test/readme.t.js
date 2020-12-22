@@ -46,7 +46,7 @@
 // Out unit test begins here.
 
 //
-require('proof')(45, okay => {
+require('proof')(47, okay => {
     // We are going to use Node.js assert to make sure we do not overshoot a
     // line that should have raised an exception.
 
@@ -665,7 +665,33 @@ require('proof')(45, okay => {
         throw [ 3, 2, 1 ]
     } catch (error) {
         const value = rescue(error, [ Array, [ 3, 2, 1 ], { length: 3 } ]).errors.shift()
-        okay(value, [ 3, 2, 1 ], 'caught array by unordered elements')
+        okay(value, [ 3, 2, 1 ], 'caught array exactly')
+    }
+    //
+
+    // You can match objects.
+
+    //
+    try {
+        throw { hello: 'world', status: 'erroneous' }
+    } catch (error) {
+        const value = rescue(error, [ Object, { hello: 'world' } ]).errors.shift()
+        okay(value, { hello: 'world', status: 'erroneous' }, 'caught array by unordered elements')
+    }
+    //
+
+    // You can specify any object and you will catch any instanceof that object.
+
+    //
+    {
+        class Shape {}
+        class Circle extends Shape {}
+        try {
+            throw new Circle
+        } catch (error) {
+            const value = rescue(error, [ Shape ]).errors.shift()
+            okay(value instanceof Circle, 'caught by instanceof')
+        }
     }
     //
 

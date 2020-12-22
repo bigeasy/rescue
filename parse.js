@@ -45,17 +45,21 @@ module.exports = function (pattern, { display = false } = {}) {
                 return 'range'
             }
             return type
+        case 'function': {
+                if (typeof value.prototype == 'object') {
+                    return 'Object'
+                }
+            }
         case 'string':
         case 'bigint':
         case 'symbol':
         case 'object':
         case 'array':
-        case 'function':
             return type
         }
     }
 
-    const descend = [ 'Array', 'BigInt', 'Symbol', 'Error', 'array', 'Number', 'Boolean', 'String' ]
+    const descend = [ 'Object', 'Array', 'BigInt', 'Symbol', 'Error', 'array', 'Number', 'Boolean', 'String' ]
 
     class Parser {
         static newable = true
@@ -137,6 +141,11 @@ module.exports = function (pattern, { display = false } = {}) {
 
             done () {
                 return this.forks
+            }
+        },
+        Object: class extends Parser {
+            constructor (value) {
+                super('error', value, [ 'range', 'object', 'function' ])
             }
         },
         Array: class extends Parser {
