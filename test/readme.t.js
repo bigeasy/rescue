@@ -46,7 +46,7 @@
 // Out unit test begins here.
 
 //
-require('proof')(38, okay => {
+require('proof')(40, okay => {
     // We are going to use Node.js assert to make sure we do not overshoot a
     // line that should have raised an exception.
 
@@ -484,7 +484,7 @@ require('proof')(38, okay => {
             throw error
         } catch (error) {
             rescue(error, [ 'aggregate', [[ 'wrapper', Error, 'io' ], [ 'wrapper' ]] ])
-            okay
+            okay('caught exception with overlapping fork patterns')
             rescue(error, [ 'aggregate', [[ 'wrapper' ], [ 'wrapper', Error, 'io' ]] ])
         }
     } catch (error) {
