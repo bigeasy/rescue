@@ -1,4 +1,4 @@
-const subordinate = require('subordinate')
+const semblance = require('semblance')
 
 function sortof (value) {
     if (value == null) {
@@ -16,7 +16,7 @@ function condition (test) {
             conditions.push(value => value instanceof test.type)
         }
         for (const pattern of test.patterns) {
-            conditions.push(value => subordinate(value, pattern))
+            conditions.push(value => semblance(value, pattern))
         }
     }
     return conditions

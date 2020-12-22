@@ -22,7 +22,7 @@
     {
                             "empathy":                      "0.0.2",
                             "interrupt":                    "11.0.0-alpha.11",
-                            "subordinate":                  "6.0.0-alpha.1"
+                            "semblance":                    "^2.0.1"
     },
     "devDependencies":
     {
