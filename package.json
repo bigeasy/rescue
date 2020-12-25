@@ -21,7 +21,7 @@
     "dependencies":
     {
                             "empathy":                      "0.0.3",
-                            "interrupt":                    "11.0.0-alpha.13",
+                            "interrupt":                    "11.0.0-alpha.14",
                             "semblance":                    "^2.0.1"
     },
     "devDependencies":
