@@ -1,4 +1,4 @@
-module.exports = require('interrupt').create('Rescue.Error', {
+module.exports = require('interrupt').Interrupt.create('Rescue.Error', {
     PARSE_ERROR: {},
     TOO_MANY_RANGES: {
         code: 'PARSE_ERROR',
