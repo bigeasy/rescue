@@ -1,7 +1,5 @@
 const assert = require('assert')
 
-const sortof = require('empathy')
-
 const Rescue = { Error: require('./error') }
 
 module.exports = function (pattern, { display = false } = {}) {
@@ -38,7 +36,7 @@ module.exports = function (pattern, { display = false } = {}) {
         if (value instanceof RegExp) {
             return 'regex'
         }
-        const type = sortof(value)
+        const type = typeof(value)
         switch (type) {
         case 'number':
             if (Number.isInteger(value) && value >= 0) {
@@ -54,7 +52,9 @@ module.exports = function (pattern, { display = false } = {}) {
         case 'bigint':
         case 'symbol':
         case 'object':
-        case 'array':
+            if (Array.isArray(value)) {
+                return 'array'
+            }
             return type
         }
     }
