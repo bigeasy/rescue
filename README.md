@@ -2,7 +2,7 @@
 [![codecov](https://codecov.io/gh/bigeasy/rescue/branch/master/graph/badge.svg)](https://codecov.io/gh/bigeasy/rescue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Conditionally catch a JavaScript exception based on type and properties,
+Conditionally catch a JavaScript exception based on type and properties.
 
 | What          | Where                                         |
 | --- | --- |
