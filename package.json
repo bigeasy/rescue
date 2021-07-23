@@ -21,7 +21,7 @@
     "dependencies":
     {
                             "interrupt":                    "11.0.0-alpha.21",
-                            "semblance":                    "^2.0.1"
+                            "semblance":                    "^3.0.0"
     },
     "devDependencies":
     {
