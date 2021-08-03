@@ -20,7 +20,7 @@
     },
     "dependencies":
     {
-                            "interrupt":                    "11.0.0-alpha.23",
+                            "interrupt":                    "11.0.0-alpha.24",
                             "semblance":                    "^3.0.0"
     },
     "devDependencies":
