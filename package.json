@@ -1,6 +1,6 @@
 {
     "name":                 "rescue",
-    "version":              "7.0.0-alpha.16",
+    "version":              "7.0.0-alpha.17",
     "description":
 
       "Conditionally catch a JavaScript exception based on type and properties.",
